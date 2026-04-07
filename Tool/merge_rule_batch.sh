@@ -1,1 +1,1 @@
-python Tool/merge_rule.py -b ./Tool/batch.txt -o ./Rule
+python Tool/surge_merge.py -b ./Tool/batch.txt -o ./Rule
