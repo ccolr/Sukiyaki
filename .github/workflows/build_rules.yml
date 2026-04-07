@@ -1,0 +1,71 @@
+name: Build Surge Rules
+
+on:
+  # 每天 UTC 22:00 (北京时间 6:00) 全量构建
+  schedule:
+    - cron: "0 22 * * *"
+
+  # Sukiyaki 仓库有 push 时触发增量构建
+  push:
+    paths:
+      - "Rule/**.conf"
+
+  # 允许手动触发全量构建
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Sukiyaki (本仓库)
+        uses: actions/checkout@v4
+        with:
+          path: Sukiyaki
+
+      - name: Checkout Rule (目标仓库)
+        uses: actions/checkout@v4
+        with:
+          repository: ccolr/Rule
+          token: ${{ secrets.RULE_REPO_TOKEN }}
+          path: Rule
+
+      - name: 检测变更的组别 (push 触发时)
+        id: changed
+        if: github.event_name == 'push'
+        run: |
+          cd Sukiyaki
+          # 获取本次 push 中变更的 Rule/*.conf 文件名 (不含路径和后缀)
+          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+            | grep '^Rule/.*\.conf$' \
+            | sed 's|Rule/||; s|\.conf$||' \
+            | tr '\n' ' ' \
+            | xargs)
+          echo "groups=${CHANGED}" >> $GITHUB_OUTPUT
+          echo "检测到变更组别: ${CHANGED}"
+
+      - name: 全量构建 (定时/手动触发)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Sukiyaki/Tool/surge_classify.py \
+            -b Sukiyaki/Tool/classify_batch.txt \
+            -o Rule
+
+      - name: 增量构建 (push 触发)
+        if: github.event_name == 'push' && steps.changed.outputs.groups != ''
+        run: |
+          python3 Sukiyaki/Tool/surge_classify.py \
+            -b Sukiyaki/Tool/classify_batch.txt \
+            -o Rule \
+            --only ${{ steps.changed.outputs.groups }}
+
+      - name: 推送到 Rule 仓库
+        run: |
+          cd Rule
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Surge/
+          # 如果没有变更则跳过 commit
+          git diff --cached --quiet && echo "无变更, 跳过推送" && exit 0
+          git commit -m "Auto-build: $(date -u '+%Y-%m-%d %H:%M UTC') [$(echo '${{ github.event_name }}')]"
+          git push
