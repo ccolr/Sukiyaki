@@ -47,6 +47,7 @@ jobs:
 
       - name: 全量构建 (定时/手动触发)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        working-directory: Sukiyaki
         run: |
           python3 Sukiyaki/Tool/surge_classify.py \
             -b Sukiyaki/Tool/classify_batch.txt \
@@ -54,6 +55,7 @@ jobs:
 
       - name: 增量构建 (push 触发)
         if: github.event_name == 'push' && steps.changed.outputs.groups != ''
+        working-directory: Sukiyaki
         run: |
           python3 Sukiyaki/Tool/surge_classify.py \
             -b Sukiyaki/Tool/classify_batch.txt \
