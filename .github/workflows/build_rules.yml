@@ -72,3 +72,6 @@ jobs:
           git diff --cached --quiet && echo "无变更, 跳过推送" && exit 0
           git commit -m "Auto-build: $(date -u '+%Y-%m-%d %H:%M UTC') [$(echo '${{ github.event_name }}')]"
           git push
+
+      - name: 触发 Vercel 重新部署
+        run: curl -X POST "${{ secrets.RULE_DEPLOY_HOOK }}"
