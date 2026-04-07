@@ -1,0 +1,1 @@
+python Tool/merge_rule.py -b ./Tool/batch.txt -o ./Rule
