@@ -50,16 +50,16 @@ jobs:
         working-directory: Sukiyaki
         run: |
           python3 Tool/surge_classify.py \
-            -b Sukiyaki/Tool/classify_batch.txt \
-            -o Rule
+            -b Tool/classify_batch.txt \
+            -o ../Rule
 
       - name: 增量构建 (push 触发)
         if: github.event_name == 'push' && steps.changed.outputs.groups != ''
         working-directory: Sukiyaki
         run: |
           python3 Tool/surge_classify.py \
-            -b Sukiyaki/Tool/classify_batch.txt \
-            -o Rule \
+            -b Tool/classify_batch.txt \
+            -o ../Rule \
             --only ${{ steps.changed.outputs.groups }}
 
       - name: 推送到 Rule 仓库
