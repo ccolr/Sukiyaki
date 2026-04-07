@@ -11,6 +11,7 @@ import sys
 import re
 import urllib.request
 import urllib.error
+from datetime import datetime, timezone
 
 # ============================================================
 # 规则分类定义
@@ -207,6 +208,48 @@ def classify_rules(rules: list[str]) -> tuple[list[str], list[str], list[str]]:
     return domains, non_ip, ip
 
 
+NON_IP_ORDER = [
+    "DOMAIN",
+    "DOMAIN-SUFFIX",
+    "DOMAIN-KEYWORD",
+    "DOMAIN-WILDCARD",
+    "PROCESS-NAME",
+    "USER-AGENT",
+    "URL-REGEX",
+    "PROTOCOL",
+    "HOSTNAME-TYPE",
+    "AND",
+    "OR",
+    "NOT",
+    "SRC-IP",
+    "SUBNET",
+    "DEST-PORT",
+    "IN-PORT",
+    "SRC-PORT",
+]
+
+IP_ORDER = [
+    "IP-CIDR",
+    "IP-CIDR6",
+    "GEOIP",
+    "IP-ASN",
+]
+
+
+def sort_classified(
+    domains: list[str],
+    non_ip: list[str],
+    ip: list[str],
+) -> tuple[list[str], list[str], list[str]]:
+    """对 non_ip 和 ip 按规定顺序排序, domains 保持原序"""
+
+    def sort_by_order(rules: list[str], order: list[str]) -> list[str]:
+        priority = {p: i for i, p in enumerate(order)}
+        return sorted(rules, key=lambda r: priority.get(r.split(",")[0].strip().upper(), len(order)))
+
+    return domains, sort_by_order(non_ip, NON_IP_ORDER), sort_by_order(ip, IP_ORDER)
+
+
 # ============================================================
 # 写出
 # ============================================================
@@ -221,11 +264,6 @@ def write_classified(
     urls: list[str],
     stats: dict,
 ) -> dict[str, str]:
-    """
-    写出三个分类文件
-    output_base: ccolr/Rule 仓库根目录路径
-    返回写出的文件路径字典
-    """
     category_map = {
         "domains": domains,
         "non_ip": non_ip,
@@ -236,8 +274,13 @@ def write_classified(
     written = {}
 
     source_comment = "\n".join(f"# [{i}] {u}" for i, u in enumerate(urls, 1))
+    build_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     for category, rule_list in category_map.items():
+        if not rule_list:
+            print(f"  [{category}] 为空, 跳过生成")
+            continue
+
         out_dir = os.path.join(output_base, "Surge", category)
         os.makedirs(out_dir, exist_ok=True)
         out_path = os.path.join(out_dir, filename)
@@ -249,8 +292,7 @@ def write_classified(
                 f"# Group    : {name}",
                 f"# Category : {category}",
                 f"# Count    : {len(rule_list)}",
-                "# ------------------------------------------------------------",
-                source_comment,
+                f"# Built    : {build_time}",
                 "# ============================================================",
                 "",
             ]
@@ -259,8 +301,7 @@ def write_classified(
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(header)
             f.write("\n".join(rule_list))
-            if rule_list:
-                f.write("\n")
+            f.write("\n")
 
         written[category] = out_path
         print(f"  [{category}] {len(rule_list)} 条 → {out_path}")
@@ -379,6 +420,7 @@ def main():
             continue
 
         domains, non_ip, ip = classify_rules(rules)
+        domains, non_ip, ip = sort_classified(domains, non_ip, ip)
         write_classified(domains, non_ip, ip, args.output_dir, name, urls, stats)
         print_stats(stats, name)
 
