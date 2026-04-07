@@ -124,15 +124,15 @@ VALID_PREFIXES = {
     "AND",
     "OR",
     "NOT",
-    "IP-CIDR",
-    "IP-CIDR6",
-    "GEOIP",
-    "IP-ASN",
     "SRC-IP",
     "SUBNET",
     "DEST-PORT",
     "IN-PORT",
     "SRC-PORT",
+    "IP-CIDR",
+    "IP-CIDR6",
+    "GEOIP",
+    "IP-ASN",
 }
 
 import re
@@ -268,15 +268,15 @@ RULE_ORDER = [
     "AND",
     "OR",
     "NOT",
-    "IP-CIDR",
-    "IP-CIDR6",
-    "GEOIP",
-    "IP-ASN",
     "SRC-IP",
     "SUBNET",
     "DEST-PORT",
     "IN-PORT",
     "SRC-PORT",
+    "IP-CIDR",
+    "IP-CIDR6",
+    "GEOIP",
+    "IP-ASN",
 ]
 
 NEED_NO_RESOLVE = {"IP-CIDR", "IP-CIDR6", "GEOIP", "IP-ASN"}
