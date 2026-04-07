@@ -49,7 +49,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         working-directory: Sukiyaki
         run: |
-          python3 Sukiyaki/Tool/surge_classify.py \
+          python3 Tool/surge_classify.py \
             -b Sukiyaki/Tool/classify_batch.txt \
             -o Rule
 
@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'push' && steps.changed.outputs.groups != ''
         working-directory: Sukiyaki
         run: |
-          python3 Sukiyaki/Tool/surge_classify.py \
+          python3 Tool/surge_classify.py \
             -b Sukiyaki/Tool/classify_batch.txt \
             -o Rule \
             --only ${{ steps.changed.outputs.groups }}
