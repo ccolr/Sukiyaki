@@ -5,12 +5,14 @@ Surge Rule Classifier
      分别推送至 ccolr/Rule 仓库的 Surge/domains, Surge/non_ip, Surge/ip 目录
 """
 
+import re
 import argparse
 import os
 import sys
 import re
 import urllib.request
 import urllib.error
+import time
 from datetime import datetime, timezone
 
 # ============================================================
@@ -54,14 +56,11 @@ _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*
 # ============================================================
 # 排除规则列表
 # ============================================================
-EXCLUDE_RULES: set[str] = {
-    rule.upper()
-    for rule in [
-        # --- 在下方填写要排除的规则 ---
-        # --- 结束 ---
-    ]
-    if rule.strip()
-}
+EXCLUDE_RULES: list[str] = [
+    # --- 在下方填写要排除的规则 (正则表达式, 大小写不敏感) ---
+    r"7h1s_rul35et_i5_mad3_by_5ukk4w",
+    # --- 结束 ---
+]
 
 
 # ============================================================
@@ -107,34 +106,52 @@ def ensure_no_resolve(rule: str) -> str:
 # ============================================================
 
 
-def fetch_content(url: str) -> list[str]:
+MAX_RETRIES = 3
+RETRY_DELAY = 5  # 秒，每次重试间隔
+
+
+def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY) -> list[str] | None:
     print(f"  正在读取: {url}")
     if not url.startswith("http://") and not url.startswith("https://"):
         if not os.path.isfile(url):
             print(f"  [错误] 本地文件不存在: {url}", file=sys.stderr)
-            return []
+            return None
         try:
             with open(url, "r", encoding="utf-8") as f:
                 return f.read().splitlines()
         except Exception as e:
             print(f"  [错误] 读取本地文件失败 {url}: {e}", file=sys.stderr)
-            return []
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (surge-classify-script)"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            raw = resp.read()
-            try:
-                text = raw.decode("utf-8")
-            except UnicodeDecodeError:
-                text = raw.decode("latin-1")
-            return text.splitlines()
-    except urllib.error.HTTPError as e:
-        print(f"  [错误] HTTP {e.code}: {url}", file=sys.stderr)
-    except urllib.error.URLError as e:
-        print(f"  [错误] 无法访问 {url}: {e.reason}", file=sys.stderr)
-    except Exception as e:
-        print(f"  [错误] {url}: {e}", file=sys.stderr)
-    return []
+            return None
+
+    for attempt in range(1, retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (surge-merge-script)"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                raw = resp.read()
+                try:
+                    text = raw.decode("utf-8")
+                except UnicodeDecodeError:
+                    text = raw.decode("latin-1")
+                if attempt > 1:
+                    print(f"  [重试成功] 第 {attempt} 次尝试成功: {url}")
+                return text.splitlines()
+        except urllib.error.HTTPError as e:
+            print(f"  [错误] HTTP {e.code}: {url}", file=sys.stderr)
+            # 4xx 错误重试无意义，直接放弃
+            if 400 <= e.code < 500:
+                print(f"  [放弃] 客户端错误，不再重试", file=sys.stderr)
+                return None
+        except urllib.error.URLError as e:
+            print(f"  [错误] 无法访问 (第 {attempt}/{retries} 次): {url} — {e.reason}", file=sys.stderr)
+        except Exception as e:
+            print(f"  [错误] 未知错误 (第 {attempt}/{retries} 次): {url} — {e}", file=sys.stderr)
+
+        if attempt < retries:
+            print(f"  [重试] {delay} 秒后进行第 {attempt + 1} 次尝试...", file=sys.stderr)
+            time.sleep(delay)
+
+    print(f"  [放弃] 已重试 {retries} 次，仍无法读取: {url}", file=sys.stderr)
+    return None
 
 
 # ============================================================
@@ -142,24 +159,29 @@ def fetch_content(url: str) -> list[str]:
 # ============================================================
 
 
-def merge_and_clean(urls: list[str]) -> tuple[list[str], dict]:
+def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = None) -> tuple[list[str] | None, dict]:
     stats = {
         "sources": len(urls),
         "total_lines": 0,
         "discarded": 0,
         "before_dedup": 0,
         "excluded": 0,
+        "excluded_rules": [],
+        "failed_sources": 0,
         "after_dedup": 0,
     }
 
-    print(f"\n[1/3] 拉取 {len(urls)} 个规则源...")
+    print(f"\n[1/4] 拉取 {len(urls)} 个规则源...")
     all_lines = []
     for url in urls:
         lines = fetch_content(url)
+        if lines is None:
+            print(f"\n[错误] 源 {url} 读取失败，终止当前任务以避免规则集不完整", file=sys.stderr)
+            return None, stats  # 返回 None 通知调用方
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/3] 清洗...")
+    print(f"\n[2/4] 清洗...")
     cleaned = []
     for line in all_lines:
         result = clean_rule(line)
@@ -169,18 +191,33 @@ def merge_and_clean(urls: list[str]) -> tuple[list[str], dict]:
             cleaned.append(result)
     stats["before_dedup"] = len(cleaned)
 
-    print(f"\n[3/3] 去重并应用排除规则...")
+    global_patterns = []
+    for pattern_str in EXCLUDE_RULES:
+        try:
+            global_patterns.append(re.compile(pattern_str, re.IGNORECASE))
+        except re.error as e:
+            print(f"[警告] 全局排除规则正则有误 ({pattern_str!r}): {e}", file=sys.stderr)
+    all_patterns = global_patterns + (group_excludes or [])
+
+    print(f"\n[3/4] 去重...")
     seen: set[str] = set()
-    deduped = []
+    deduped: list[str] = []
     for rule in cleaned:
         key = rule.upper()
-        if key in EXCLUDE_RULES:
-            stats["excluded"] += 1
-            continue
         if key not in seen:
             seen.add(key)
             deduped.append(rule)
+    stats["before_dedup"] = len(cleaned)
     stats["after_dedup"] = len(deduped)
+
+    print(f"\n[4/4] 应用排除规则...")  # 注意这里步骤编号也要跟着调整
+    final: list[str] = []
+    for rule in deduped:
+        if any(p.search(rule) for p in all_patterns):
+            stats["excluded"] += 1
+            stats["excluded_rules"].append(rule)
+            continue
+        final.append(rule)
 
     return deduped, stats
 
@@ -314,10 +351,14 @@ def print_stats(stats: dict, name: str):
     print(f"  {name} 完成!")
     print(f"{'=' * 50}")
     print(f"  规则源数量        : {stats['sources']}")
+    print(f"  读取失败源        : {stats['failed_sources']}")
     print(f"  原始总行数        : {stats['total_lines']}")
     print(f"  清洗丢弃          : {stats['discarded']}")
     print(f"  有效规则(去重前)  : {stats['before_dedup']}")
     print(f"  排除规则          : {stats['excluded']}")
+    if stats.get("excluded_rules"):
+        for r in stats["excluded_rules"]:
+            print(f"    - {r}")
     print(f"  有效规则(去重后)  : {stats['after_dedup']}")
     print(f"{'=' * 50}")
 
@@ -327,7 +368,7 @@ def print_stats(stats: dict, name: str):
 # ============================================================
 
 
-def parse_batch_file(batch_path: str) -> list[tuple[str, list[str]]]:
+def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Pattern]]]:
     if not os.path.isfile(batch_path):
         print(f"[错误] 找不到批量配置文件: {batch_path}", file=sys.stderr)
         sys.exit(1)
@@ -335,25 +376,58 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str]]]:
     groups = []
     current_name = None
     current_sources = []
+    current_excludes = []
+    phase = "sources"  # sources -> excludes, 只能单向推进
 
     with open(batch_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for lineno, raw in enumerate(f, 1):
+            line = raw.strip()
             if not line or line.startswith("#"):
                 continue
+
             if line.startswith("[") and line.endswith("]"):
                 if current_name is not None:
-                    groups.append((current_name, current_sources))
+                    if not current_sources:
+                        print(f"[错误] 组别 [{current_name}] 没有任何规则源", file=sys.stderr)
+                        sys.exit(1)
+                    groups.append((current_name, current_sources, current_excludes))
                 current_name = line[1:-1].strip()
                 current_sources = []
+                current_excludes = []
+                phase = "sources"
+
+            elif line.startswith("! "):
+                if phase == "sources" and not current_sources:
+                    print(
+                        f"[错误] 第 {lineno} 行: 排除规则出现在任何源地址之前 (组别: {current_name})", file=sys.stderr
+                    )
+                    sys.exit(1)
+                phase = "excludes"
+                pattern_str = line[2:].strip()
+                try:
+                    compiled = re.compile(pattern_str, re.IGNORECASE)
+                    current_excludes.append(compiled)
+                except re.error as e:
+                    print(
+                        f"[错误] 第 {lineno} 行: 正则表达式有误 ({pattern_str!r}): {e} (组别: {current_name})",
+                        file=sys.stderr,
+                    )
+                    sys.exit(1)
+
             else:
                 if current_name is None:
-                    print("[错误] 规则行出现在任何 [分组] 之前", file=sys.stderr)
+                    print(f"[错误] 第 {lineno} 行: 规则行出现在任何 [分组] 之前", file=sys.stderr)
+                    sys.exit(1)
+                if phase == "excludes":
+                    print(f"[错误] 第 {lineno} 行: 源地址出现在排除规则之后 (组别: {current_name})", file=sys.stderr)
                     sys.exit(1)
                 current_sources.append(line)
 
     if current_name is not None:
-        groups.append((current_name, current_sources))
+        if not current_sources:
+            print(f"[错误] 组别 [{current_name}] 没有任何规则源", file=sys.stderr)
+            sys.exit(1)
+        groups.append((current_name, current_sources, current_excludes))
 
     if not groups:
         print("[错误] 批量配置文件中未找到任何有效分组", file=sys.stderr)
@@ -397,8 +471,8 @@ def main():
     # 增量模式: 只处理指定组别
     if args.only:
         only_set = set(args.only)
-        tasks = [(n, u) for n, u in all_tasks if n in only_set]
-        not_found = only_set - {n for n, _ in tasks}
+        tasks = [(n, u, e) for n, u, e in all_tasks if n in only_set]
+        not_found = only_set - {n for n, *_ in tasks}
         if not_found:
             print(f"[警告] 以下组别在配置文件中未找到: {', '.join(not_found)}", file=sys.stderr)
         if not tasks:
@@ -408,12 +482,16 @@ def main():
         tasks = all_tasks
 
     total = len(tasks)
-    for idx, (name, urls) in enumerate(tasks, 1):
+    for idx, (name, urls, group_excludes) in enumerate(tasks, 1):
         print(f"\n{'=' * 50}")
         print(f"  任务 [{idx}/{total}]: {name}")
         print(f"{'=' * 50}")
 
-        rules, stats = merge_and_clean(urls)
+        rules, stats = merge_and_clean(urls, group_excludes)
+
+        if rules is None:
+            print(f"[错误] 任务 {name} 因源读取失败而终止，跳过输出", file=sys.stderr)
+            continue
 
         if not rules:
             print(f"[警告] {name} 合并结果为空, 跳过", file=sys.stderr)
