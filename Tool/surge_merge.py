@@ -99,14 +99,16 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
                 current_excludes = []
                 phase = "sources"
 
-            elif line.startswith("! "):
+            elif line.startswith("!"):
                 if phase == "sources" and not current_sources:
                     print(
                         f"[错误] 第 {lineno} 行: 排除规则出现在任何源地址之前 (组别: {current_name})", file=sys.stderr
                     )
                     sys.exit(1)
                 phase = "excludes"
-                pattern_str = line[2:].strip()
+                pattern_str = line[1:].strip()
+                if not pattern_str:
+                    continue
                 try:
                     compiled = re.compile(pattern_str, re.IGNORECASE)
                     current_excludes.append(compiled)
