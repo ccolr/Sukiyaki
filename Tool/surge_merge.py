@@ -294,7 +294,7 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
         final.append(rule)
 
     print(f"\n[5/5] 按规则类型排序并补全 no-resolve...")
-    sorted_rules = sort_rules(deduped)
+    sorted_rules = sort_rules(final)
     stats["after_dedup"] = len(sorted_rules)
 
     return sorted_rules, stats

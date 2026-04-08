@@ -219,7 +219,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
             continue
         final.append(rule)
 
-    return deduped, stats
+    return final, stats
 
 
 # ============================================================
