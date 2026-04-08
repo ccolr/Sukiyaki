@@ -457,29 +457,12 @@ def main():
         metavar="DIR",
         help="ccolr/Rule 仓库根目录路径",
     )
-    parser.add_argument(
-        "--only",
-        nargs="+",
-        metavar="GROUP_NAME",
-        help="只处理指定组别名称 (用于增量构建, 空格分隔)",
-    )
 
     args = parser.parse_args()
 
     all_tasks = parse_batch_file(args.batch)
 
-    # 增量模式: 只处理指定组别
-    if args.only:
-        only_set = set(args.only)
-        tasks = [(n, u, e) for n, u, e in all_tasks if n in only_set]
-        not_found = only_set - {n for n, *_ in tasks}
-        if not_found:
-            print(f"[警告] 以下组别在配置文件中未找到: {', '.join(not_found)}", file=sys.stderr)
-        if not tasks:
-            print("[错误] 没有匹配的组别, 退出", file=sys.stderr)
-            sys.exit(1)
-    else:
-        tasks = all_tasks
+    tasks = all_tasks
 
     total = len(tasks)
     for idx, (name, urls, group_excludes) in enumerate(tasks, 1):
