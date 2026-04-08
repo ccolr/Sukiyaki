@@ -381,6 +381,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
 
     with open(batch_path, "r", encoding="utf-8") as f:
         for lineno, raw in enumerate(f, 1):
+            print(f"[调试] 第{lineno}行 repr: {repr(raw)}", file=sys.stderr)
             line = raw.strip()
             if not line or line.startswith("#"):
                 continue
@@ -470,7 +471,6 @@ def main():
     for idx, (name, urls, group_excludes) in enumerate(tasks, 1):
         print(f"\n{'=' * 50}")
         print(f"  任务 [{idx}/{total}]: {name}")
-        print(f"  [调试] group_excludes: {group_excludes}", file=sys.stderr)
         print(f"{'=' * 50}")
         rules, stats = merge_and_clean(urls, group_excludes)
 
