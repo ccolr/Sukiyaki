@@ -211,7 +211,6 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
     stats["after_dedup"] = len(deduped)
 
     print(f"\n[4/4] 应用排除规则...")
-    print(f"  [调试] group_excludes: {group_excludes}", file=sys.stderr)
     final: list[str] = []
     for rule in deduped:
         if any(p.search(rule) for p in all_patterns):
@@ -470,7 +469,7 @@ def main():
         print(f"\n{'=' * 50}")
         print(f"  任务 [{idx}/{total}]: {name}")
         print(f"{'=' * 50}")
-
+        print(f"  [调试] group_excludes: {group_excludes}", file=sys.stderr)
         rules, stats = merge_and_clean(urls, group_excludes)
 
         if rules is None:
