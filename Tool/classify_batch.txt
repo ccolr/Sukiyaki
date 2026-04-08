@@ -291,7 +291,7 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Whatsapp.
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
 ./Rule/WhatsApp.conf
 
-[Youtube]
+[YouTube]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTubeMusic/YouTubeMusic.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Youtube.list
