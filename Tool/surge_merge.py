@@ -181,13 +181,11 @@ _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*
 
 
 def strip_inline_comment(line: str) -> str:
-    # // 必须前面是空白（或行首）才算注释，避免截断 https://
     for marker in ("#", ";"):
         pos = line.find(marker)
         if pos != -1:
             line = line[:pos]
 
-    # // 只在前面是空白时才认定为注释
     slash_pos = re.search(r"(?<!\S)//", line)
     if slash_pos:
         line = line[: slash_pos.start()]
@@ -200,7 +198,6 @@ def clean_rule(line: str) -> str | None:
     if not line or line.startswith("#") or line.startswith(";") or line.startswith("//"):
         return None
     line = strip_inline_comment(line)
-    line = line.strip()
     if not line:
         return None
 
@@ -208,12 +205,7 @@ def clean_rule(line: str) -> str | None:
         prefix = line.split(",")[0].strip().upper()
         if prefix not in VALID_PREFIXES:
             return None
-        # 有前缀的规则行（URL-REGEX 等）不做引号替换，避免破坏正则内容
     else:
-        # 纯域名行才做引号和空格清理
-        line = line.replace("'", " ").replace('"', " ").strip()
-        if not line:
-            return None
         if not _PLAIN_DOMAIN_RE.match(line):
             return None
 
