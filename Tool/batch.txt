@@ -191,6 +191,10 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Other.list
 https://ruleset.skk.moe/List/non_ip/global.conf
 ./Rule/Proxy.conf
+EXCLUDE: google
+EXCLUDE: facebook
+EXCLUDE: whatsapp
+EXCLUDE: discord
 
 [Rakuten]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Rakuten/Rakuten.list
