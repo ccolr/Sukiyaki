@@ -21,6 +21,12 @@ from datetime import datetime, timezone
 DOMAIN_ONLY_PREFIXES = set()  # 纯域名, 无前缀字段
 
 NON_IP_PREFIXES = {
+    "SUBNET",
+    "SRC-IP",
+    "SRC-PORT",
+    "IN-PORT",
+    "DEST-PORT",
+    "PROTOCOL",
     "DOMAIN",
     "DOMAIN-SUFFIX",
     "DOMAIN-KEYWORD",
@@ -28,16 +34,10 @@ NON_IP_PREFIXES = {
     "PROCESS-NAME",
     "USER-AGENT",
     "URL-REGEX",
-    "PROTOCOL",
     "HOSTNAME-TYPE",
     "AND",
     "OR",
     "NOT",
-    "SRC-IP",
-    "SUBNET",
-    "DEST-PORT",
-    "IN-PORT",
-    "SRC-PORT",
 }
 
 IP_PREFIXES = {
@@ -246,6 +246,12 @@ def classify_rules(rules: list[str]) -> tuple[list[str], list[str], list[str]]:
 
 
 NON_IP_ORDER = [
+    "SUBNET",
+    "SRC-IP",
+    "SRC-PORT",
+    "IN-PORT",
+    "DEST-PORT",
+    "PROTOCOL",
     "DOMAIN",
     "DOMAIN-SUFFIX",
     "DOMAIN-KEYWORD",
@@ -253,16 +259,10 @@ NON_IP_ORDER = [
     "PROCESS-NAME",
     "USER-AGENT",
     "URL-REGEX",
-    "PROTOCOL",
     "HOSTNAME-TYPE",
     "AND",
     "OR",
     "NOT",
-    "SRC-IP",
-    "SUBNET",
-    "DEST-PORT",
-    "IN-PORT",
-    "SRC-PORT",
 ]
 
 IP_ORDER = [
