@@ -181,54 +181,39 @@ _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*
 
 
 def strip_inline_comment(line: str) -> str:
-    """去除行尾注释: 支持 #, //, ; 风格"""
-    # 按顺序尝试, 取最早出现的注释符位置
-    # 但要避免误伤规则内容本身(规则内容不含这些符号, 所以直接切割是安全的)
-    for marker in ("#", "//", ";"):
+    # // 必须前面是空白（或行首）才算注释，避免截断 https://
+    for marker in ("#", ";"):
         pos = line.find(marker)
         if pos != -1:
             line = line[:pos]
+
+    # // 只在前面是空白时才认定为注释
+    slash_pos = re.search(r"(?<!\S)//", line)
+    if slash_pos:
+        line = line[: slash_pos.start()]
+
     return line.strip()
 
 
 def clean_rule(line: str) -> str | None:
-    """
-    清洗单行规则, 返回清洗后的规则字符串, 或 None 表示丢弃该行
-    处理顺序:
-      1. 去除前后空格
-      2. 跳过空行和整行注释
-      3. 去除行尾注释
-      4. 将引号替换为空格
-      5. 再次去除前后空格
-      6. 校验规则类型, 不合法则丢弃
-    """
-    # 1. 去除前后空格
     line = line.strip()
-
-    # 2. 跳过空行和整行注释
     if not line or line.startswith("#") or line.startswith(";") or line.startswith("//"):
         return None
-
-    # 3. 去除行尾注释
     line = strip_inline_comment(line)
-
-    # 4. 引号转空格
-    line = line.replace("'", " ").replace('"', " ")
-
-    # 5. 再次清理空格
     line = line.strip()
-
     if not line:
         return None
 
-    # 6. 校验规则类型
     if "," in line:
-        # 有逗号: 取第一个字段作为类型
         prefix = line.split(",")[0].strip().upper()
         if prefix not in VALID_PREFIXES:
             return None
+        # 有前缀的规则行（URL-REGEX 等）不做引号替换，避免破坏正则内容
     else:
-        # 无逗号: 必须是合法的纯域名
+        # 纯域名行才做引号和空格清理
+        line = line.replace("'", " ").replace('"', " ").strip()
+        if not line:
+            return None
         if not _PLAIN_DOMAIN_RE.match(line):
             return None
 
