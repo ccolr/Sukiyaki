@@ -33,6 +33,8 @@ https://ruleset.skk.moe/List/domainset/icloud_private_relay.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Apple/Apple_All_No_Resolve.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/AppleIntelligence.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple.list
+https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
+https://ruleset.skk.moe/List/non_ip/apple_intelligence.conf
 ./Rule/Apple.conf
 
 [Bahamut]
@@ -67,6 +69,7 @@ https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.Chin
 https://ruleset.skk.moe/List/non_ip/apple_cn.conf
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple_cn.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Direct/Direct.list
+https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
 ./Rule/Direct.conf
 
 [Discord]
@@ -186,6 +189,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 
 [Proxy]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Other.list
+https://ruleset.skk.moe/List/non_ip/global.conf
 ./Rule/Proxy.conf
 
 [Rakuten]
@@ -200,7 +204,9 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Reddit.li
 [Reject_Drop]
 https://ruleset.skk.moe/List/non_ip/reject-no-drop.conf
 https://ruleset.skk.moe/List/non_ip/reject-drop.conf
+https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/ip/reject.conf
+https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
 ./Rule/Reject_Drop.conf
 
 [Reject]
