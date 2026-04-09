@@ -198,7 +198,6 @@ EXCLUDE: gmail
 EXCLUDE: android
 EXCLUDE: goog
 EXCLUDE: gle
-EXCLUDE: googlefiber
 EXCLUDE: go.dev
 EXCLUDE: amazon
 EXCLUDE: aws
