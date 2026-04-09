@@ -192,6 +192,16 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Other.lis
 https://ruleset.skk.moe/List/non_ip/global.conf
 ./Rule/Proxy.conf
 EXCLUDE: google
+EXCLUDE: chrome
+EXCLUDE: youtube
+EXCLUDE: gmail
+EXCLUDE: android
+EXCLUDE: goog
+EXCLUDE: gle
+EXCLUDE: googlefiber
+EXCLUDE: go.dev
+EXCLUDE: amazon
+EXCLUDE: aws
 EXCLUDE: facebook
 EXCLUDE: whatsapp
 EXCLUDE: discord
