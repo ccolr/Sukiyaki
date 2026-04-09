@@ -9,7 +9,6 @@ import re
 import argparse
 import os
 import sys
-import re
 import urllib.request
 import urllib.error
 import time
@@ -53,6 +52,9 @@ VALID_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES
 
 _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*$")
 
+# 行内注释匹配：「一个或多个空白字符」+「注释符(# ; //)」+「后面所有内容」
+_INLINE_COMMENT_RE = re.compile(r"\s+(#|;|//).*$")
+
 # ============================================================
 # 排除规则列表
 # ============================================================
@@ -64,46 +66,46 @@ EXCLUDE_RULES: list[str] = [
 
 
 # ============================================================
-# 清洗逻辑 (与 surge_merge.py 保持一致)
+# 清洗逻辑
 # ============================================================
 
 
-def strip_inline_comment(line: str) -> str:
-    for marker in ("#", ";"):
-        pos = line.find(marker)
-        if pos != -1:
-            line = line[:pos]
-
-    slash_pos = re.search(r"(?<!\S)//", line)
-    if slash_pos:
-        line = line[: slash_pos.start()]
-
-    return line.strip()
+def ensure_no_resolve(rule: str) -> str:
+    parts = rule.split(",")
+    if parts[-1].strip().lower() != "no-resolve":
+        return rule + ",no-resolve"
+    return rule
 
 
 def clean_rule(line: str) -> str | None:
+    # 步骤1: 去除首尾空字符
     line = line.strip()
-    if not line or line.startswith("#") or line.startswith(";") or line.startswith("//"):
-        return None
-    line = strip_inline_comment(line)
+
+    # 步骤2: 空行或非指定类别开头直接删除
     if not line:
         return None
-
+    if line.startswith("#") or line.startswith(";") or line.startswith("//"):
+        return None
     if "," in line:
-        prefix = line.split(",")[0].strip().upper()
+        prefix = line.split(",")[0].strip()  # 不做 .upper()，严格区分大小写
         if prefix not in VALID_PREFIXES:
             return None
     else:
         if not _PLAIN_DOMAIN_RE.match(line):
             return None
 
+    # 步骤3: 去除行内注释
+    line = _INLINE_COMMENT_RE.sub("", line).strip()
+    if not line:
+        return None
+
+    # 步骤4: 补全 no-resolve
+    if "," in line:
+        rule_type = line.split(",")[0].strip()
+        if rule_type in NEED_NO_RESOLVE:
+            line = ensure_no_resolve(line)
+
     return line
-
-
-def ensure_no_resolve(rule: str) -> str:
-    if ",no-resolve" not in rule.lower():
-        return rule + ",no-resolve"
-    return rule
 
 
 # ============================================================
@@ -142,7 +144,6 @@ def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY
                 return text.splitlines()
         except urllib.error.HTTPError as e:
             print(f"  [错误] HTTP {e.code}: {url}", file=sys.stderr)
-            # 4xx 错误重试无意义，直接放弃
             if 400 <= e.code < 500:
                 print(f"  [放弃] 客户端错误，不再重试", file=sys.stderr)
                 return None
@@ -182,11 +183,11 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         lines = fetch_content(url)
         if lines is None:
             print(f"\n[错误] 源 {url} 读取失败，终止当前任务以避免规则集不完整", file=sys.stderr)
-            return None, stats  # 返回 None 通知调用方
+            return None, stats
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/4] 清洗...")
+    print(f"\n[2/4] 清洗（去首尾空白 → 过滤非法行 → 去行内注释 → 补全 no-resolve）...")
     cleaned = []
     for line in all_lines:
         result = clean_rule(line)
@@ -204,13 +205,12 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
             print(f"[警告] 全局排除规则正则有误 ({pattern_str!r}): {e}", file=sys.stderr)
     all_patterns = global_patterns + (group_excludes or [])
 
-    print(f"\n[3/4] 去重...")
+    print(f"\n[3/4] 去重（严格区分大小写）...")
     seen: set[str] = set()
     deduped: list[str] = []
     for rule in cleaned:
-        key = rule.upper()
-        if key not in seen:
-            seen.add(key)
+        if rule not in seen:  # 不做大小写转换，严格区分
+            seen.add(rule)
             deduped.append(rule)
     stats["before_dedup"] = len(cleaned)
     stats["after_dedup"] = len(deduped)
@@ -239,13 +239,12 @@ def classify_rules(rules: list[str]) -> tuple[list[str], list[str], list[str]]:
     domains, non_ip, ip = [], [], []
     for rule in rules:
         if "," in rule:
-            prefix = rule.split(",")[0].strip().upper()
+            prefix = rule.split(",")[0].strip()  # 不做 .upper()，严格区分大小写
             if prefix in IP_PREFIXES:
-                ip.append(ensure_no_resolve(rule))
+                ip.append(rule)  # no-resolve 已在 clean_rule 阶段处理
             else:
                 non_ip.append(rule)
         else:
-            # 纯域名
             domains.append(rule)
     return domains, non_ip, ip
 
@@ -287,7 +286,7 @@ def sort_classified(
 
     def sort_by_order(rules: list[str], order: list[str]) -> list[str]:
         priority = {p: i for i, p in enumerate(order)}
-        return sorted(rules, key=lambda r: priority.get(r.split(",")[0].strip().upper(), len(order)))
+        return sorted(rules, key=lambda r: priority.get(r.split(",")[0].strip(), len(order)))  # 不做 .upper()
 
     return domains, sort_by_order(non_ip, NON_IP_ORDER), sort_by_order(ip, IP_ORDER)
 
@@ -382,7 +381,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
     current_name = None
     current_sources = []
     current_excludes = []
-    phase = "sources"  # sources -> excludes, 只能单向推进
+    phase = "sources"
 
     with open(batch_path, "r", encoding="utf-8") as f:
         for lineno, raw in enumerate(f, 1):

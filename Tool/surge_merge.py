@@ -142,13 +142,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
     return groups
 
 
-def is_comment_or_empty(line: str) -> bool:
-    """判断是否为注释行或空行"""
-    stripped = line.strip()
-    return stripped == "" or stripped.startswith("#") or stripped.startswith(";") or stripped.startswith("//")
-
-
-# 合法的规则类型前缀
+# 合法的规则类型前缀（区分大小写，必须严格匹配）
 VALID_PREFIXES = {
     "SUBNET",
     "SRC-IP",
@@ -173,41 +167,92 @@ VALID_PREFIXES = {
     "IP-ASN",
 }
 
-import re
-
-# 纯域名: 只允许字母开头或 "." 开头, 且只包含字母/数字/"-"/"."
-# 不允许连续两个 ".", 不允许除上述字符之外的其他字符
+# 纯域名：只允许字母/数字/"-"/"."，可以以"."开头
 _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*$")
 
+# 行内注释匹配：「一个或多个空白字符」+「注释符(# ; //)」+「后面所有内容」
+# 注释符必须紧跟在空白字符后面，防止误截断域名或规则内容中的 # 字符
+_INLINE_COMMENT_RE = re.compile(r"\s+(#|;|//).*$")
 
-def strip_inline_comment(line: str) -> str:
-    for marker in ("#", ";"):
-        pos = line.find(marker)
-        if pos != -1:
-            line = line[:pos]
+# 规则类型优先级顺序
+RULE_ORDER = [
+    "SUBNET",
+    "SRC-IP",
+    "SRC-PORT",
+    "IN-PORT",
+    "DEST-PORT",
+    "PROTOCOL",
+    "PLAIN_DOMAIN",  # 纯域名 / . 开头
+    "DOMAIN",
+    "DOMAIN-SUFFIX",
+    "DOMAIN-KEYWORD",
+    "DOMAIN-WILDCARD",
+    "PROCESS-NAME",
+    "USER-AGENT",
+    "URL-REGEX",
+    "HOSTNAME-TYPE",
+    "AND",
+    "OR",
+    "NOT",
+    "IP-CIDR",
+    "IP-CIDR6",
+    "GEOIP",
+    "IP-ASN",
+]
 
-    slash_pos = re.search(r"(?<!\S)//", line)
-    if slash_pos:
-        line = line[: slash_pos.start()]
+NEED_NO_RESOLVE = {"IP-CIDR", "IP-CIDR6", "GEOIP", "IP-ASN"}
 
-    return line.strip()
+
+def ensure_no_resolve(rule: str) -> str:
+    """为需要 no-resolve 的规则补全后缀（大小写严格，统一补全为小写 no-resolve）"""
+    # 检查时忽略大小写，但补全时统一使用小写
+    parts = rule.split(",")
+    if parts[-1].strip().lower() != "no-resolve":
+        return rule + ",no-resolve"
+    return rule
 
 
 def clean_rule(line: str) -> str | None:
+    """
+    严格按以下顺序处理每一行：
+    1. 去除首尾空字符
+    2. 空行 或 非指定类别开头 → 直接删除（返回 None）
+    3. 去除行内注释（空字符+注释符 结构及其后内容）
+    4. 补全 no-resolve
+    """
+    # 步骤 1：去除首尾空字符
     line = line.strip()
-    if not line or line.startswith("#") or line.startswith(";") or line.startswith("//"):
-        return None
-    line = strip_inline_comment(line)
+
+    # 步骤 2：空行直接删除
     if not line:
         return None
 
+    # 步骤 2：整行注释（行首就是注释符）→ 非指定类别，直接删除
+    if line.startswith("#") or line.startswith(";") or line.startswith("//"):
+        return None
+
+    # 步骤 2：验证规则前缀（严格区分大小写，不做任何大小写转换）
     if "," in line:
-        prefix = line.split(",")[0].strip().upper()
+        # 含逗号：取逗号前的部分作为前缀，严格匹配 VALID_PREFIXES
+        prefix = line.split(",")[0].strip()
         if prefix not in VALID_PREFIXES:
             return None
     else:
+        # 不含逗号：必须是合法的纯域名格式
         if not _PLAIN_DOMAIN_RE.match(line):
             return None
+
+    # 步骤 3：去除行内注释
+    # 匹配「一个或多个空白」+「# 或 ; 或 //」+「之后所有内容」
+    line = _INLINE_COMMENT_RE.sub("", line).strip()
+    if not line:
+        return None
+
+    # 步骤 4：补全 no-resolve（仅针对需要的规则类型）
+    if "," in line:
+        rule_type = line.split(",")[0].strip()
+        if rule_type in NEED_NO_RESOLVE:
+            line = ensure_no_resolve(line)
 
     return line
 
@@ -239,11 +284,11 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
         lines = fetch_content(url)
         if lines is None:
             print(f"\n[错误] 源 {url} 读取失败，终止当前任务以避免规则集不完整", file=sys.stderr)
-            return None, stats  # 返回 None 通知调用方
+            return None, stats
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/5] 清洗注释、空行、行尾注释及非法规则...")
+    print(f"\n[2/5] 清洗（去首尾空白 → 过滤非法行 → 去行内注释 → 补全 no-resolve）...")
     cleaned: list[str] = []
     for line in all_lines:
         result = clean_rule(line)
@@ -253,18 +298,15 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
             cleaned.append(result)
     stats["before_dedup"] = len(cleaned)
 
-    print(f"\n[3/5] 去重...")
+    print(f"\n[3/5] 去重（严格区分大小写）...")
     seen: set[str] = set()
     deduped: list[str] = []
     for rule in cleaned:
-        key = rule.upper()
-        if key not in seen:
-            seen.add(key)
+        if rule not in seen:  # 严格区分大小写，不做任何大小写转换
+            seen.add(rule)
             deduped.append(rule)
-    stats["before_dedup"] = len(cleaned)
-    stats["after_dedup"] = len(deduped)
 
-    print(f"\n[4/5] 应用排除规则...")  # 注意这里步骤编号也要跟着调整
+    print(f"\n[4/5] 应用排除规则...")
     final: list[str] = []
     for rule in deduped:
         if any(p.search(rule) for p in all_patterns):
@@ -273,70 +315,32 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
             continue
         final.append(rule)
 
-    print(f"\n[5/5] 按规则类型排序并补全 no-resolve...")
+    print(f"\n[5/5] 按规则类型排序...")
     sorted_rules = sort_rules(final)
     stats["after_dedup"] = len(sorted_rules)
 
     return sorted_rules, stats
 
 
-# 规则类型优先级顺序
-RULE_ORDER = [
-    "SUBNET",
-    "SRC-IP",
-    "SRC-PORT",
-    "IN-PORT",
-    "DEST-PORT",
-    "PROTOCOL",
-    "PLAIN_DOMAIN",  # 纯域名 / . 开头
-    "DOMAIN",
-    "DOMAIN-SUFFIX",
-    "DOMAIN-KEYWORD",
-    "DOMAIN-WILDCARD",
-    "PROCESS-NAME",
-    "USER-AGENT",
-    "URL-REGEX",
-    "HOSTNAME-TYPE",
-    "AND",
-    "OR",
-    "NOT",
-    "IP-CIDR",
-    "IP-CIDR6",
-    "GEOIP",
-    "IP-ASN",
-]
-
-NEED_NO_RESOLVE = {"IP-CIDR", "IP-CIDR6", "GEOIP", "IP-ASN"}
-
-
 def get_rule_type(rule: str) -> str:
-    """识别规则类型"""
+    """识别规则类型（严格区分大小写）"""
     stripped = rule.strip()
     if not stripped:
         return "UNKNOWN"
-    # 纯域名: 不含逗号, 或以 "." 开头
+    # 不含逗号，或以 "." 开头 → 纯域名
     if "," not in stripped or stripped.startswith("."):
         return "PLAIN_DOMAIN"
-    prefix = stripped.split(",")[0].upper()
+    prefix = stripped.split(",")[0].strip()  # 不做大小写转换
     return prefix if prefix in RULE_ORDER else "UNKNOWN"
 
 
-def ensure_no_resolve(rule: str) -> str:
-    """为需要 no-resolve 的规则补全后缀"""
-    if ",no-resolve" not in rule.lower():
-        return rule + ",no-resolve"
-    return rule
-
-
 def sort_rules(rules: list[str]) -> list[str]:
-    """按规则类型排序, 并为 IP 类规则补全 no-resolve"""
+    """按规则类型排序（no-resolve 已在 clean_rule 阶段处理，此处不再重复）"""
     priority = {rtype: i for i, rtype in enumerate(RULE_ORDER)}
 
     processed = []
     for rule in rules:
         rtype = get_rule_type(rule)
-        if rtype in NEED_NO_RESOLVE:
-            rule = ensure_no_resolve(rule)
         processed.append((priority.get(rtype, len(RULE_ORDER)), rule))
 
     processed.sort(key=lambda x: x[0])

@@ -70,7 +70,11 @@ https://ruleset.skk.moe/List/non_ip/apple_cn.conf
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple_cn.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Direct/Direct.list
 https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/cncidr.txt
 ./Rule/Direct.conf
+EXCLUDE: apple
+EXCLUDE: microsoft
+EXCLUDE: steam
 
 [Discord]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Discord/Discord.list
@@ -230,6 +234,8 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://ruleset.skk.moe/List/domainset/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdGuardSDNSFilter/AdGuardSDNSFilter_All_No_Resolve.list
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/reject.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/reject.txt
 ./Rule/Reject.conf
 EXCLUDE: juejin\.cn$
 
@@ -262,6 +268,8 @@ https://ruleset.skk.moe/List/non_ip/telegram.conf
 https://ruleset.skk.moe/List/ip/telegram.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Telegram/Telegram.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Telegram.list
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/telegramcidr.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/telegramcidr.txt
 ./Rule/Telegram.conf
 
 [Telia_Super]
