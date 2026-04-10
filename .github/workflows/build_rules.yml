@@ -6,7 +6,7 @@ on:
   push:
     paths:
       - "Rule/**.conf"
-      - "Tool/batch.txt"
+      - "Tool/classify_batch.txt"
       - "Tool/surge_classify.py"
   workflow_dispatch:
 
@@ -30,7 +30,7 @@ jobs:
         working-directory: Sukiyaki
         run: |
           python3 Tool/surge_classify.py \
-            -b Tool/batch.txt \
+            -b Tool/classify_batch.txt \
             -o ../Rule
 
       - name: 推送到 Rule 仓库
