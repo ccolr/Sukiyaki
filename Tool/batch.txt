@@ -35,6 +35,8 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/AppleInte
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple.list
 https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
 https://ruleset.skk.moe/List/non_ip/apple_intelligence.conf
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/icloud.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/icloud.txt
 ./Rule/Apple.conf
 
 [Bahamut]
@@ -104,6 +106,8 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Gemini.li
 [Google]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Google.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Google/Google.list
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/google.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
 ./Rule/Google.conf
 
 [HBO]
