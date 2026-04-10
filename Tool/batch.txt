@@ -200,6 +200,7 @@ https://ruleset.skk.moe/List/non_ip/reject-drop.conf
 https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
+EXCLUDE: juejin\.cn$
 
 [Reject]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Hijacking.list
