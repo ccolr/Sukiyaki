@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: Sukiyaki
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Rule
         uses: actions/checkout@v4
@@ -41,9 +42,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Rule/
-          git diff --cached --quiet && echo "Rule/ 无变更, 跳过提交" || \
+          if git diff --cached --quiet; then
+            echo "Rule/ 无变更, 跳过提交"
+          else
             git commit -m "Auto-merge: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
-          git push
+            git push
+          fi
 
       - name: 构建规则集到外部 Rule 仓库
         working-directory: Sukiyaki
