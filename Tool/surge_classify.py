@@ -171,10 +171,11 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         "total_lines": 0,
         "discarded": 0,
         "before_dedup": 0,
+        "after_dedup": 0,  # 去重后、排除前
         "excluded": 0,
         "excluded_rules": [],
         "failed_sources": 0,
-        "after_dedup": 0,
+        "final": 0,  # 排除后最终数量
     }
 
     print(f"\n[1/4] 拉取 {len(urls)} 个规则源...")
@@ -195,7 +196,6 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
             stats["discarded"] += 1
         else:
             cleaned.append(result)
-    stats["before_dedup"] = len(cleaned)
 
     global_patterns = []
     for pattern_str in EXCLUDE_RULES:
@@ -209,11 +209,10 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
     seen: set[str] = set()
     deduped: list[str] = []
     for rule in cleaned:
-        if rule not in seen:  # 不做大小写转换，严格区分
+        if rule not in seen:
             seen.add(rule)
             deduped.append(rule)
-    stats["before_dedup"] = len(cleaned)
-    stats["after_dedup"] = len(deduped)
+    stats["after_dedup"] = len(deduped)  # ← 去重后立刻记录
 
     print(f"\n[4/4] 应用排除规则...")
     final: list[str] = []
@@ -223,6 +222,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
             stats["excluded_rules"].append(rule)
             continue
         final.append(rule)
+    stats["final"] = len(final)  # ← 排除后记录最终数量
 
     return final, stats
 
@@ -351,7 +351,7 @@ def write_classified(
 
 
 def print_stats(stats: dict, name: str):
-    print(f"\n{'=' * 50}")
+    print(f"{'=' * 50}")
     print(f"  {name} 完成!")
     print(f"{'=' * 50}")
     print(f"  规则源数量        : {stats['sources']}")
@@ -359,11 +359,13 @@ def print_stats(stats: dict, name: str):
     print(f"  原始总行数        : {stats['total_lines']}")
     print(f"  清洗丢弃          : {stats['discarded']}")
     print(f"  有效规则(去重前)  : {stats['before_dedup']}")
+    print(f"  有效规则(去重后)  : {stats['after_dedup']}")
     print(f"  排除规则          : {stats['excluded']}")
     if stats.get("excluded_rules"):
         for r in stats["excluded_rules"]:
             print(f"    - {r}")
-    print(f"  有效规则(去重后)  : {stats['after_dedup']}")
+    print(f"  有效规则(最终)    : {stats['final']}")
+    print(f"  重复去除          : {stats['before_dedup'] - stats['after_dedup']}")
     print(f"{'=' * 50}")
 
 

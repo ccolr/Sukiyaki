@@ -264,10 +264,11 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
         "total_lines": 0,
         "comment_or_empty": 0,
         "before_dedup": 0,
+        "after_dedup": 0,  # 去重后、排除前
         "excluded": 0,
         "excluded_rules": [],
         "failed_sources": 0,
-        "after_dedup": 0,
+        "final": 0,  # 排除后的最终数量
     }
 
     # 全局排除规则转为正则
@@ -302,9 +303,10 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
     seen: set[str] = set()
     deduped: list[str] = []
     for rule in cleaned:
-        if rule not in seen:  # 严格区分大小写，不做任何大小写转换
+        if rule not in seen:
             seen.add(rule)
             deduped.append(rule)
+    stats["after_dedup"] = len(deduped)  # ← 这里记录真正的去重后数量
 
     print(f"\n[4/5] 应用排除规则...")
     final: list[str] = []
@@ -314,10 +316,10 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
             stats["excluded_rules"].append(rule)
             continue
         final.append(rule)
+    stats["final"] = len(final)  # ← 这里记录排除后数量
 
     print(f"\n[5/5] 按规则类型排序...")
     sorted_rules = sort_rules(final)
-    stats["after_dedup"] = len(sorted_rules)
 
     return sorted_rules, stats
 
@@ -385,12 +387,13 @@ def print_stats(stats: dict, output_path: str):
     print(f"  原始总行数        : {stats['total_lines']}")
     print(f"  注释/空行/非法    : {stats['comment_or_empty']}")
     print(f"  有效规则(去重前)  : {stats['before_dedup']}")
+    print(f"  有效规则(去重后)  : {stats['after_dedup']}")  # 现在语义准确
     print(f"  排除规则          : {stats.get('excluded', 0)}")
     if stats.get("excluded_rules"):
         for r in stats["excluded_rules"]:
             print(f"    - {r}")
-    print(f"  有效规则(去重后)  : {stats['after_dedup']}")
-    print(f"  重复去除          : {stats['before_dedup'] - stats['after_dedup'] - stats.get('excluded', 0)}")
+    print(f"  有效规则(最终)    : {stats['final']}")
+    print(f"  重复去除          : {stats['before_dedup'] - stats['after_dedup']}")  # 不再混入 excluded
     print(f"  输出文件          : {output_path}")
     print("=" * 50)
 
