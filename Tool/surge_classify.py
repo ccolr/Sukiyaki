@@ -204,6 +204,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         except re.error as e:
             print(f"[警告] 全局排除规则正则有误 ({pattern_str!r}): {e}", file=sys.stderr)
     all_patterns = global_patterns + (group_excludes or [])
+    stats["before_dedup"] = len(cleaned)
 
     print(f"\n[3/4] 去重（严格区分大小写）...")
     seen: set[str] = set()
