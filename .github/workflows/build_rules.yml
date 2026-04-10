@@ -6,8 +6,11 @@ on:
   push:
     paths:
       - "Rule/**.conf"
+      - "MyRule/**.conf"
       - "Tool/classify_batch.txt"
+      - "Tool/batch.txt"
       - "Tool/surge_classify.py"
+      - "Tool/surge_merge.py"
   workflow_dispatch:
 
 jobs:
@@ -26,7 +29,24 @@ jobs:
           token: ${{ secrets.RULE_REPO_TOKEN }}
           path: Rule
 
-      - name: 构建规则集
+      - name: 合并规则到本仓库 Rule/
+        working-directory: Sukiyaki
+        run: |
+          python3 Tool/surge_merge.py \
+            -b Tool/batch.txt \
+            -o ./Rule
+
+      - name: 提交本仓库 Rule/ 变更
+        working-directory: Sukiyaki
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Rule/
+          git diff --cached --quiet && echo "Rule/ 无变更, 跳过提交" || \
+            git commit -m "Auto-merge: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
+          git push
+
+      - name: 构建规则集到外部 Rule 仓库
         working-directory: Sukiyaki
         run: |
           python3 Tool/surge_classify.py \

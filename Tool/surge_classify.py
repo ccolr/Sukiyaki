@@ -303,7 +303,6 @@ def write_classified(
     ip: list[str],
     output_base: str,
     name: str,
-    urls: list[str],
     stats: dict,
 ) -> dict[str, str]:
     category_map = {
@@ -315,7 +314,6 @@ def write_classified(
     filename = name if name.endswith(".conf") else name + ".conf"
     written = {}
 
-    source_comment = "\n".join(f"# [{i}] {u}" for i, u in enumerate(urls, 1))
     build_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     for category, rule_list in category_map.items():
@@ -492,7 +490,7 @@ def main():
 
         domains, non_ip, ip = classify_rules(rules)
         domains, non_ip, ip = sort_classified(domains, non_ip, ip)
-        write_classified(domains, non_ip, ip, args.output_dir, name, urls, stats)
+        write_classified(domains, non_ip, ip, args.output_dir, name, stats)
         print_stats(stats, name)
         success_count += 1
 
