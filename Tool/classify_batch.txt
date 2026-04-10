@@ -243,5 +243,5 @@
 ./MyRule/WhatsApp.conf
 
 [Youtube]
-./Rule/Youtube.conf
-./MyRule/Youtube.conf
+./Rule/YouTube.conf
+./MyRule/YouTube.conf
