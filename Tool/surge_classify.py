@@ -472,6 +472,7 @@ def main():
     tasks = all_tasks
 
     total = len(tasks)
+    success_count = 0
     for idx, (name, urls, group_excludes) in enumerate(tasks, 1):
         print(f"\n{'=' * 50}")
         print(f"  任务 [{idx}/{total}]: {name}")
@@ -490,9 +491,10 @@ def main():
         domains, non_ip, ip = sort_classified(domains, non_ip, ip)
         write_classified(domains, non_ip, ip, args.output_dir, name, urls, stats)
         print_stats(stats, name)
+        success_count += 1
 
     if total > 1:
-        print(f"\n全部完成, 共处理 {total} 个组别")
+        print(f"\n全部完成, 成功处理 {success_count}/{total} 个组别")
 
 
 if __name__ == "__main__":

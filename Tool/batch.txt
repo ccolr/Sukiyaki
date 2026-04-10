@@ -1,15 +1,15 @@
 [ABEMA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Abema/Abema.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Abema.list
-./Rule/ABEMA.conf
+./MyRule/ABEMA.conf
 
 [AcFun]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AcFun/AcFun.list
-./Rule/AcFun.conf
+./MyRule/AcFun.conf
 
 [Adobe]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Adobe/Adobe.list
-./Rule/Adobe.conf
+./MyRule/Adobe.conf
 
 [AI]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Openai.list
@@ -20,11 +20,11 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Perplexit
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Cursor.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Ai_other.list
 https://ruleset.skk.moe/List/non_ip/ai.conf
-./Rule/AI.conf
+./MyRule/AI.conf
 
 [Amazon]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Amazon/Amazon.list
-./Rule/Amazon.conf
+./MyRule/Amazon.conf
 
 [Apple]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple.list
@@ -39,43 +39,41 @@ https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/icloud.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/icloud.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/apple.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/apple.txt
-./Rule/Apple.conf
+https://ruleset.skk.moe/List/non_ip/apple_cn.conf
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple_cn.list
+./MyRule/Apple.conf
 
 [Bahamut]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Bahamut/Bahamut.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bahamut.list
-./Rule/Bahamut.conf
+./MyRule/Bahamut.conf
 
 [BBC]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/BBC.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BBC/BBC.list
-./Rule/BBC.conf
+./MyRule/BBC.conf
 
 [BiliBili]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BiliBili/BiliBili.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bilibili.list
-./Rule/BiliBili.conf
+./MyRule/BiliBili.conf
 
 [DAZN]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/DAZN/DAZN.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Dazn.list
-./Rule/DAZN.conf
+./MyRule/DAZN.conf
 
 [Direct]
 https://ruleset.skk.moe/List/non_ip/domestic.conf
 https://ruleset.skk.moe/List/non_ip/direct.conf
 https://ruleset.skk.moe/List/ip/domestic.conf
-https://ruleset.skk.moe/List/non_ip/lan.conf
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Direct.list
-https://ruleset.skk.moe/List/ip/lan.conf
 https://ruleset.skk.moe/List/ip/china_ip.conf
 https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list
-https://ruleset.skk.moe/List/non_ip/apple_cn.conf
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple_cn.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Direct/Direct.list
 https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/cncidr.txt
-./Rule/Direct.conf
+./MyRule/Direct.conf
 EXCLUDE: apple
 EXCLUDE: microsoft
 EXCLUDE: steam
@@ -83,67 +81,74 @@ EXCLUDE: steam
 [Discord]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Discord/Discord.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Discord.list
-./Rule/Discord.conf
+./MyRule/Discord.conf
 
 [Disney]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Disney/Disney.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Disney.list
-./Rule/Disney.conf
+./MyRule/Disney.conf
 
 [eBay]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/eBay/eBay.list
-./Rule/eBay.conf
+./MyRule/eBay.conf
 
 [Facebook]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Facebook.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/MetaPlatforms.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Facebook/Facebook.list
-./Rule/Facebook.conf
+./MyRule/Facebook.conf
 
 [Gemini]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Gemini/Gemini.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Gemini.list
-./Rule/Gemini.conf
+./MyRule/Gemini.conf
 
 [Google]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Google.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Google/Google.list
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/google.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
-./Rule/Google.conf
+./MyRule/Google.conf
 
 [HBO]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/HBO.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/HBO/HBO.list
-./Rule/HBO.conf
+./MyRule/HBO.conf
 
 [HK]
-./Rule/HK.conf
+./MyRule/HK.conf
 
 [Hulu]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Hulu/Hulu.list
-./Rule/Hulu.conf
+./MyRule/Hulu.conf
 
 [Instagram]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Instagram.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Instagram/Instagram.list
-./Rule/Instagram.conf
+./MyRule/Instagram.conf
 
 [IP_Check]
-./Rule/IP_Check.conf
+./MyRule/IP_Check.conf
 
 [JP]
-./Rule/JP.conf
+./MyRule/JP.conf
+
+[Lan]
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/private.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/private.txt
+https://ruleset.skk.moe/List/non_ip/lan.conf
+https://ruleset.skk.moe/List/ip/lan.conf
+./MyRule/Lan.conf
 
 [Line]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Line.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Line/Line.list
-./Rule/Line.conf
+./MyRule/Line.conf
 
 [LinkedIn]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/LinkedIn/LinkedIn.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Linkedin.list
-./Rule/LinkedIn.conf
+./MyRule/LinkedIn.conf
 
 [Microsoft]
 https://ruleset.skk.moe/List/non_ip/microsoft.conf
@@ -152,55 +157,55 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Microsoft
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Microsoft_cn.list
 https://ruleset.skk.moe/List/non_ip/microsoft_cdn.conf
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/PrimeVideo.list
-./Rule/Microsoft.conf
+./MyRule/Microsoft.conf
 
 [NetEaseMusic]
 https://ruleset.skk.moe/List/non_ip/neteasemusic.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/NetEaseMusic/NetEaseMusic.list
-./Rule/NetEaseMusic.conf
+./MyRule/NetEaseMusic.conf
 
 [Netflix]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Netflix/Netflix.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Netflix.list
-./Rule/Netflix.conf
+./MyRule/Netflix.conf
 
 [NicoNico]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Niconico/Niconico.list
-./Rule/NicoNico.conf
+./MyRule/NicoNico.conf
 
 [Nintendo]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Nintendo/Nintendo.list
-./Rule/Nintendo.conf
+./MyRule/Nintendo.conf
 
 [Notion]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Notion/Notion.list
-./Rule/Notion.conf
+./MyRule/Notion.conf
 
 [O2_GG]
-./Rule/O2_GG.conf
+./MyRule/O2_GG.conf
 
 [Oracle]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Oracle/Oracle.list
-./Rule/Oracle.conf
+./MyRule/Oracle.conf
 
 [PayPal]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Paypal.list
-./Rule/PayPal.conf
+./MyRule/PayPal.conf
 
 [PikPak]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PikPak/PikPak.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/PikPak.list
-./Rule/PikPak.conf
+./MyRule/PikPak.conf
 
 [Pixiv]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Pixiv/Pixiv.list
-./Rule/Pixiv.conf
+./MyRule/Pixiv.conf
 
 [Proxy]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Other.list
 https://ruleset.skk.moe/List/non_ip/global.conf
-./Rule/Proxy.conf
+./MyRule/Proxy.conf
 EXCLUDE: google
 EXCLUDE: chrome
 EXCLUDE: youtube
@@ -217,12 +222,12 @@ EXCLUDE: discord
 
 [Rakuten]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Rakuten/Rakuten.list
-./Rule/Rakuten.conf
+./MyRule/Rakuten.conf
 
 [Reddit]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Reddit/Reddit.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Reddit.list
-./Rule/Reddit.conf
+./MyRule/Reddit.conf
 
 [Reject_Drop]
 https://ruleset.skk.moe/List/non_ip/reject-no-drop.conf
@@ -230,7 +235,7 @@ https://ruleset.skk.moe/List/non_ip/reject-drop.conf
 https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
-./Rule/Reject_Drop.conf
+./MyRule/Reject_Drop.conf
 
 [Reject]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Hijacking.list
@@ -242,32 +247,32 @@ https://ruleset.skk.moe/List/non_ip/reject.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdGuardSDNSFilter/AdGuardSDNSFilter_All_No_Resolve.list
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/reject.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/reject.txt
-./Rule/Reject.conf
+./MyRule/Reject.conf
 EXCLUDE: juejin\.cn$
 
 [Sony]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Sony/Sony.list
-./Rule/Sony.conf
+./MyRule/Sony.conf
 
 [Special]
-./Rule/Special.conf
+./MyRule/Special.conf
 
 [SpeedTest]
 https://ruleset.skk.moe/List/domainset/speedtest.conf
-./Rule/SpeedTest.conf
+./MyRule/SpeedTest.conf
 
 [Spotify]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Spotify/Spotify.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Spotify.list
-./Rule/Spotify.conf
+./MyRule/Spotify.conf
 
 [Steam]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Steam/Steam.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Steam.list
-./Rule/Steam.conf
+./MyRule/Steam.conf
 
 [Stripe]
-./Rule/Stripe.conf
+./MyRule/Stripe.conf
 
 [Telegram]
 https://ruleset.skk.moe/List/non_ip/telegram.conf
@@ -276,57 +281,57 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Telegram.list
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/telegramcidr.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/telegramcidr.txt
-./Rule/Telegram.conf
+./MyRule/Telegram.conf
 
 [Telia_Super]
-./Rule/Telia_Super.conf
+./MyRule/Telia_Super.conf
 
 [TikTok]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/TikTok/TikTok.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Tiktok.list
-./Rule/TikTok.conf
+./MyRule/TikTok.conf
 
 [Tumblr]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Tumblr/Tumblr.list
-./Rule/Tumblr.conf
+./MyRule/Tumblr.conf
 
 [TVer]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/TVer/TVer.list
-./Rule/TVer.conf
+./MyRule/TVer.conf
 
 [TW]
-./Rule/TW.conf
+./MyRule/TW.conf
 
 [Twitch]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Twitch/Twitch.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitch.list
-./Rule/Twitch.conf
+./MyRule/Twitch.conf
 
 [Twitter]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Twitter/Twitter.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitter.list
-./Rule/Twitter.conf
+./MyRule/Twitter.conf
 
 [U-NEXT]
-./Rule/U-NEXT.conf
+./MyRule/U-NEXT.conf
 
 [UltraMobile]
-./Rule/UltraMobile.conf
+./MyRule/UltraMobile.conf
 
 [US]
-./Rule/US.conf
+./MyRule/US.conf
 
 [VOA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/VOA/VOA.list
-./Rule/VOA.conf
+./MyRule/VOA.conf
 
 [WhatsApp]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Whatsapp.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
-./Rule/WhatsApp.conf
+./MyRule/WhatsApp.conf
 
 [Youtube]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTubeMusic/YouTubeMusic.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Youtube.list
-./Rule/Youtube.conf
+./MyRule/Youtube.conf

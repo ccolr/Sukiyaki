@@ -452,6 +452,7 @@ def main():
         tasks = parse_batch_file(args.batch)
 
     total = len(tasks)
+    success_count = 0
     for idx, task in enumerate(tasks, 1):
         if len(task) == 3:
             name, urls, group_excludes = task
@@ -475,9 +476,10 @@ def main():
 
         output_path = write_output(rules, args.output_dir, name, urls, stats)
         print_stats(stats, output_path)
+        success_count += 1
 
     if total > 1:
-        print(f"\n所有任务完成, 共生成 {total} 个文件, 输出目录: {args.output_dir}")
+        print(f"\n所有任务完成, 共生成 {success_count}/{total} 个文件, 输出目录: {args.output_dir}")
 
 
 if __name__ == "__main__":
