@@ -34,6 +34,10 @@
 ./Rule/BiliBili.conf
 ./MyRule/BiliBili.conf
 
+[Cloudflare]
+./Rule/Cloudflare.conf
+./MyRule/Cloudflare.conf
+
 [DAZN]
 ./Rule/DAZN.conf
 ./MyRule/DAZN.conf

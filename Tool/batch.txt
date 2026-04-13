@@ -45,6 +45,9 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bahamut.l
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/BBC.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BBC/BBC.list
 
+[Cloudflare]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Cloudflare/Cloudflare.list
+
 [BiliBili]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BiliBili/BiliBili.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bilibili.list
