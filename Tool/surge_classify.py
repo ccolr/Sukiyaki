@@ -56,10 +56,17 @@ _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*
 # 行内注释匹配：「一个或多个空白字符」+「注释符(# ; //)」+「后面所有内容」
 _INLINE_COMMENT_RE = re.compile(r"\s+(#|;|//).*$")
 
-# 匹配 logical rule 括号内的单条子规则，形如 (TYPE,VALUE) 或 (TYPE,VALUE,no-resolve)
-# 用于提取内部字段 + 补全 no-resolve
+# 匹配括号内单条子规则，第三字段只接受 no-resolve 或 extended-matching
+# group(1)=TYPE  group(2)=VALUE  group(3)=第三字段(含逗号) 或 None
 _LOGICAL_INNER_RULE_RE = re.compile(
-    r"\(([A-Z0-9\-]+),([^,)]+)(,no-resolve)?\)",
+    r"\(([A-Z0-9\-]+),([^,)]+)(,no-resolve|,extended-matching)?\)",
+    re.IGNORECASE,
+)
+
+# 用于检测括号内是否存在格式非法的子规则（第三字段既不是合法值也不是空）
+# 即形如 (TYPE,VALUE,其他任意内容) 的情况
+_LOGICAL_INNER_ILLEGAL_RE = re.compile(
+    r"\([^)]+,[^,)]+,(?!no-resolve\)|extended-matching\))[^)]+\)",
     re.IGNORECASE,
 )
 
@@ -86,63 +93,92 @@ def ensure_no_resolve(rule: str) -> str:
 
 
 def _extract_logical_inner_prefixes(rule: str) -> set[str]:
-    """
-    从 logical rule 的括号内容中提取所有子规则的字段名（大写）。
-    例: AND,((IP-CIDR,1.1.1.0/24),(DOMAIN-SUFFIX,cn)) → {"IP-CIDR", "DOMAIN-SUFFIX"}
-    """
     return {m.group(1).upper() for m in _LOGICAL_INNER_RULE_RE.finditer(rule)}
 
 
-def _fix_logical_no_resolve(rule: str) -> str:
+def _fix_logical_no_resolve(rule: str) -> str | None:
     """
-    对 logical rule 括号内缺少 no-resolve 的 IP 类子规则补全。
-    例: (GEOIP,CN) → (GEOIP,CN,no-resolve)
-        (GEOIP,CN,no-resolve) → 不变
+    校验并补全 logical rule 括号内的第三字段：
+    - ip TYPE 缺 no-resolve → 补全
+    - ip TYPE 带 extended-matching → 丢弃（返回 None）
+    - non_ip TYPE 带 no-resolve → 丢弃（返回 None）
+    - non_ip TYPE 带 extended-matching 或无第三字段 → 保留原样
+    - 第三字段是非法值 → 丢弃（返回 None）
     """
+    # 先检测是否存在非法第三字段（不属于 no-resolve/extended-matching 的情况）
+    if _LOGICAL_INNER_ILLEGAL_RE.search(rule):
+        return None
 
-    def replacer(m: re.Match) -> str:
+    def replacer(m: re.Match) -> str | None:
         type_field = m.group(1).upper()
         value = m.group(2)
-        no_resolve = m.group(3)  # 已有则不为 None
-        if type_field in NEED_NO_RESOLVE and no_resolve is None:
-            return f"({m.group(1)},{value},no-resolve)"
-        return m.group(0)  # 原样返回
+        third = m.group(3)  # ",no-resolve" / ",extended-matching" / None
 
-    return _LOGICAL_INNER_RULE_RE.sub(replacer, rule)
+        if type_field in IP_PREFIXES:
+            if third is not None and third.lower() == ",extended-matching":
+                # ip TYPE 不能带 extended-matching
+                raise _LogicalRuleInvalid()
+            # 缺 no-resolve 则补全
+            return f"({m.group(1)},{value},no-resolve)"
+
+        if type_field in NON_IP_PREFIXES:
+            if third is not None and third.lower() == ",no-resolve":
+                # non_ip TYPE 不能带 no-resolve
+                raise _LogicalRuleInvalid()
+            # 保留原样（有无 extended-matching 都合法）
+            return m.group(0)
+
+        # LOGICAL_PREFIXES 本身嵌套，不处理
+        return m.group(0)
+
+    try:
+        return _LOGICAL_INNER_RULE_RE.sub(replacer, rule)
+    except _LogicalRuleInvalid:
+        return None
+
+
+class _LogicalRuleInvalid(Exception):
+    """用于在 re.sub replacer 内部中断处理的哨兵异常"""
+
+    pass
 
 
 def _classify_logical_rule(rule: str) -> str | None:
     """
-    分析 logical rule 内部字段，返回应归属的类别，或 None 表示丢弃。
-
-    - 内部无任何已知字段 → None（丢弃）
-    - 内部同时含 non_ip 和 ip 字段 → None（丢弃，混用）
-    - 内部仅含 non_ip 字段 → "non_ip"
-    - 内部仅含 ip 字段 → "ip"
+    返回 "non_ip" / "ip" / None(丢弃)
+    此函数只判断归属，不做补全，补全在 merge_and_clean 排除后进行
     """
+    # 含非法第三字段格式 → 丢弃
+    if _LOGICAL_INNER_ILLEGAL_RE.search(rule):
+        return None
+
     inner_prefixes = _extract_logical_inner_prefixes(rule)
-
-    if not inner_prefixes:
-        return None  # 没有任何可识别字段
-
-    # 过滤掉嵌套 logical 关键字本身（AND/OR/NOT 可以嵌套）
     known = inner_prefixes - LOGICAL_PREFIXES
+
     if not known:
-        return None  # 仅剩嵌套 logical，没有实际字段
+        return None
+
+    # 含未知 TYPE → 丢弃
+    unknown_fields = known - NON_IP_PREFIXES - IP_PREFIXES
+    if unknown_fields:
+        return None
 
     has_non_ip = bool(known & NON_IP_PREFIXES)
     has_ip = bool(known & IP_PREFIXES)
-    unknown_fields = known - NON_IP_PREFIXES - IP_PREFIXES
 
-    if unknown_fields:
-        # 含有未知字段，丢弃
-        return None
     if has_non_ip and has_ip:
-        # 混用，丢弃
-        return None
-    if has_ip:
-        return "ip"
-    return "non_ip"
+        return None  # 混用
+
+    # 交叉校验第三字段与 TYPE 类别
+    for m in _LOGICAL_INNER_RULE_RE.finditer(rule):
+        type_field = m.group(1).upper()
+        third = m.group(3)
+        if type_field in IP_PREFIXES and third is not None and third.lower() == ",extended-matching":
+            return None
+        if type_field in NON_IP_PREFIXES and third is not None and third.lower() == ",no-resolve":
+            return None
+
+    return "ip" if has_ip else "non_ip"
 
 
 def clean_rule(line: str) -> str | None:
