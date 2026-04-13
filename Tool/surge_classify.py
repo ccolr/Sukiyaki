@@ -34,10 +34,9 @@ NON_IP_PREFIXES = {
     "USER-AGENT",
     "URL-REGEX",
     "HOSTNAME-TYPE",
-    "AND",
-    "OR",
-    "NOT",
 }
+
+LOGICAL_PREFIXES = {"AND", "OR", "NOT"}
 
 IP_PREFIXES = {
     "IP-CIDR",
@@ -48,12 +47,21 @@ IP_PREFIXES = {
 
 NEED_NO_RESOLVE = {"IP-CIDR", "IP-CIDR6", "GEOIP", "IP-ASN"}
 
-VALID_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES
+ALL_KNOWN_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES  # logical rule 内部字段白名单
+
+VALID_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES | LOGICAL_PREFIXES
 
 _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*$")
 
 # 行内注释匹配：「一个或多个空白字符」+「注释符(# ; //)」+「后面所有内容」
 _INLINE_COMMENT_RE = re.compile(r"\s+(#|;|//).*$")
+
+# 匹配 logical rule 括号内的单条子规则，形如 (TYPE,VALUE) 或 (TYPE,VALUE,no-resolve)
+# 用于提取内部字段 + 补全 no-resolve
+_LOGICAL_INNER_RULE_RE = re.compile(
+    r"\(([A-Z0-9\-]+),([^,)]+)(,no-resolve)?\)",
+    re.IGNORECASE,
+)
 
 # ============================================================
 # 排除规则列表
@@ -77,17 +85,77 @@ def ensure_no_resolve(rule: str) -> str:
     return rule
 
 
+def _extract_logical_inner_prefixes(rule: str) -> set[str]:
+    """
+    从 logical rule 的括号内容中提取所有子规则的字段名（大写）。
+    例: AND,((IP-CIDR,1.1.1.0/24),(DOMAIN-SUFFIX,cn)) → {"IP-CIDR", "DOMAIN-SUFFIX"}
+    """
+    return {m.group(1).upper() for m in _LOGICAL_INNER_RULE_RE.finditer(rule)}
+
+
+def _fix_logical_no_resolve(rule: str) -> str:
+    """
+    对 logical rule 括号内缺少 no-resolve 的 IP 类子规则补全。
+    例: (GEOIP,CN) → (GEOIP,CN,no-resolve)
+        (GEOIP,CN,no-resolve) → 不变
+    """
+
+    def replacer(m: re.Match) -> str:
+        type_field = m.group(1).upper()
+        value = m.group(2)
+        no_resolve = m.group(3)  # 已有则不为 None
+        if type_field in NEED_NO_RESOLVE and no_resolve is None:
+            return f"({m.group(1)},{value},no-resolve)"
+        return m.group(0)  # 原样返回
+
+    return _LOGICAL_INNER_RULE_RE.sub(replacer, rule)
+
+
+def _classify_logical_rule(rule: str) -> str | None:
+    """
+    分析 logical rule 内部字段，返回应归属的类别，或 None 表示丢弃。
+
+    - 内部无任何已知字段 → None（丢弃）
+    - 内部同时含 non_ip 和 ip 字段 → None（丢弃，混用）
+    - 内部仅含 non_ip 字段 → "non_ip"
+    - 内部仅含 ip 字段 → "ip"
+    """
+    inner_prefixes = _extract_logical_inner_prefixes(rule)
+
+    if not inner_prefixes:
+        return None  # 没有任何可识别字段
+
+    # 过滤掉嵌套 logical 关键字本身（AND/OR/NOT 可以嵌套）
+    known = inner_prefixes - LOGICAL_PREFIXES
+    if not known:
+        return None  # 仅剩嵌套 logical，没有实际字段
+
+    has_non_ip = bool(known & NON_IP_PREFIXES)
+    has_ip = bool(known & IP_PREFIXES)
+    unknown_fields = known - NON_IP_PREFIXES - IP_PREFIXES
+
+    if unknown_fields:
+        # 含有未知字段，丢弃
+        return None
+    if has_non_ip and has_ip:
+        # 混用，丢弃
+        return None
+    if has_ip:
+        return "ip"
+    return "non_ip"
+
+
 def clean_rule(line: str) -> str | None:
     # 步骤1: 去除首尾空字符
     line = line.strip()
 
-    # 步骤2: 空行或非指定类别开头直接删除
+    # 步骤2: 空行或注释直接删除
     if not line:
         return None
     if line.startswith("#") or line.startswith(";") or line.startswith("//"):
         return None
     if "," in line:
-        prefix = line.split(",")[0].strip()  # 不做 .upper()，严格区分大小写
+        prefix = line.split(",")[0].strip()  # 严格区分大小写
         if prefix not in VALID_PREFIXES:
             return None
     else:
@@ -99,7 +167,16 @@ def clean_rule(line: str) -> str | None:
     if not line:
         return None
 
-    # 步骤4: 补全 no-resolve
+    # 步骤4: logical rule 特殊处理
+    if "," in line:
+        prefix = line.split(",")[0].strip()
+        if prefix in LOGICAL_PREFIXES:
+            category = _classify_logical_rule(line)
+            if category is None:
+                return None  # 丢弃：无字段 / 混用 / 含未知字段
+            return line
+
+    # 步骤5: 普通规则补全 no-resolve
     if "," in line:
         rule_type = line.split(",")[0].strip()
         if rule_type in NEED_NO_RESOLVE:
@@ -171,11 +248,11 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         "total_lines": 0,
         "discarded": 0,
         "before_dedup": 0,
-        "after_dedup": 0,  # 去重后、排除前
+        "after_dedup": 0,
         "excluded": 0,
         "excluded_rules": [],
         "failed_sources": 0,
-        "final": 0,  # 排除后最终数量
+        "final": 0,
     }
 
     print(f"\n[1/4] 拉取 {len(urls)} 个规则源...")
@@ -188,7 +265,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/4] 清洗（去首尾空白 → 过滤非法行 → 去行内注释 → 补全 no-resolve）...")
+    print(f"\n[2/4] 清洗（去首尾空白 → 过滤非法行 → 去行内注释 → logical 规则校验 → 补全 no-resolve）...")
     cleaned = []
     for line in all_lines:
         result = clean_rule(line)
@@ -213,7 +290,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         if rule not in seen:
             seen.add(rule)
             deduped.append(rule)
-    stats["after_dedup"] = len(deduped)  # ← 去重后立刻记录
+    stats["after_dedup"] = len(deduped)
 
     print(f"\n[4/4] 应用排除规则...")
     final: list[str] = []
@@ -223,7 +300,13 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
             stats["excluded_rules"].append(rule)
             continue
         final.append(rule)
-    stats["final"] = len(final)  # ← 排除后记录最终数量
+    stats["final"] = len(final)
+
+    # [5/5] 对存活的 logical rule 补全括号内 no-resolve（排除后再做，避免无效计算）
+    print(f"\n[5/5] 补全 logical rule 括号内 no-resolve...")
+    final = [
+        _fix_logical_no_resolve(rule) if rule.split(",")[0].strip() in LOGICAL_PREFIXES else rule for rule in final
+    ]
 
     return final, stats
 
@@ -236,17 +319,28 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
 def classify_rules(rules: list[str]) -> tuple[list[str], list[str], list[str]]:
     """
     返回 (domains, non_ip, ip)
+    logical rule (AND/OR/NOT) 根据内部字段归属到 non_ip 或 ip
     """
     domains, non_ip, ip = [], [], []
     for rule in rules:
-        if "," in rule:
-            prefix = rule.split(",")[0].strip()  # 不做 .upper()，严格区分大小写
-            if prefix in IP_PREFIXES:
-                ip.append(rule)  # no-resolve 已在 clean_rule 阶段处理
-            else:
-                non_ip.append(rule)
-        else:
+        if "," not in rule:
             domains.append(rule)
+            continue
+
+        prefix = rule.split(",")[0].strip()
+
+        if prefix in LOGICAL_PREFIXES:
+            # clean_rule 已校验通过，直接查归属
+            category = _classify_logical_rule(rule)
+            if category == "ip":
+                ip.append(rule)
+            else:
+                non_ip.append(rule)  # "non_ip" 或意外的 None 都归 non_ip（理论上 None 不会到这里）
+        elif prefix in IP_PREFIXES:
+            ip.append(rule)
+        else:
+            non_ip.append(rule)
+
     return domains, non_ip, ip
 
 
@@ -275,6 +369,9 @@ IP_ORDER = [
     "IP-CIDR6",
     "GEOIP",
     "IP-ASN",
+    "AND",
+    "OR",
+    "NOT",
 ]
 
 
@@ -287,7 +384,7 @@ def sort_classified(
 
     def sort_by_order(rules: list[str], order: list[str]) -> list[str]:
         priority = {p: i for i, p in enumerate(order)}
-        return sorted(rules, key=lambda r: priority.get(r.split(",")[0].strip(), len(order)))  # 不做 .upper()
+        return sorted(rules, key=lambda r: priority.get(r.split(",")[0].strip(), len(order)))
 
     return domains, sort_by_order(non_ip, NON_IP_ORDER), sort_by_order(ip, IP_ORDER)
 
