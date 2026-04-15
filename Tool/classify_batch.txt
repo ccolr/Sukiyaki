@@ -30,9 +30,9 @@
 ./Rule/BBC.conf
 ./MyRule/BBC.conf
 
-[BiliBili]
-./Rule/BiliBili.conf
-./MyRule/BiliBili.conf
+[bilibili]
+./Rule/bilibili.conf
+./MyRule/bilibili.conf
 
 [Cloudflare]
 ./Rule/Cloudflare.conf
