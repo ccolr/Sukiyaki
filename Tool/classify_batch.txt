@@ -118,9 +118,9 @@
 ./Rule/Netflix.conf
 ./MyRule/Netflix.conf
 
-[NicoNico]
-./Rule/NicoNico.conf
-./MyRule/NicoNico.conf
+[Niconico]
+./Rule/Niconico.conf
+./MyRule/Niconico.conf
 
 [Nintendo]
 ./Rule/Nintendo.conf
