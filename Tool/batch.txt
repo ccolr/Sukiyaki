@@ -182,9 +182,11 @@ EXCLUDE: chrome
 EXCLUDE: youtube
 EXCLUDE: gmail
 EXCLUDE: android
-EXCLUDE: goog
-EXCLUDE: gle
-EXCLUDE: go.dev
+EXCLUDE: goog$
+EXCLUDE: gle$
+EXCLUDE: go\.dev$
+EXCLUDE: googleapis\.com$
+EXCLUDE: doubleclick
 EXCLUDE: amazon
 EXCLUDE: aws
 EXCLUDE: facebook
@@ -208,6 +210,8 @@ https://ruleset.skk.moe/List/ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
 EXCLUDE: juejin\.cn$
 EXCLUDE: awstrack\.me$
+EXCLUDE: googleapis\.com$
+EXCLUDE: doubleclick
 
 [Reject]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Hijacking.list
@@ -219,7 +223,8 @@ https://ruleset.skk.moe/List/non_ip/reject.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdGuardSDNSFilter/AdGuardSDNSFilter_All_No_Resolve.list
 EXCLUDE: juejin\.cn$
 EXCLUDE: awstrack\.me$
-
+EXCLUDE: googleapis\.com$
+EXCLUDE: doubleclick
 
 [Sony]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Sony/Sony.list
