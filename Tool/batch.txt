@@ -194,6 +194,7 @@ EXCLUDE: whatsapp
 EXCLUDE: discord
 EXCLUDE: telegram
 EXCLUDE: cloudflare
+EXCLUDE: githubcopilot\.com$
 
 [Rakuten]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Rakuten/Rakuten.list
