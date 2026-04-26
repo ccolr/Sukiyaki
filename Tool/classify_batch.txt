@@ -90,6 +90,10 @@
 ./Rule/IP_Check.conf
 ./MyRule/IP_Check.conf
 
+[JetBrains]
+./Rule/JetBrains.conf
+./MyRule/JetBrains.conf
+
 [JP]
 ./Rule/JP.conf
 ./MyRule/JP.conf
