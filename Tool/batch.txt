@@ -54,6 +54,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [Bahamut]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Bahamut/Bahamut.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bahamut.list
+EXCLUDE: fbcdn
 
 [BBC]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/BBC.list
