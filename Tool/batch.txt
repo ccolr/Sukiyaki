@@ -1,5 +1,6 @@
 [ABEMA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Abema/Abema.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AbemaTV/AbemaTV.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Abema.list
 
 [AcFun]
@@ -12,7 +13,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Openai.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/OpenAI/OpenAI.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Claude.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Anthropic/Anthropic.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Claude/Claude.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Copilot/Copilot.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Perplexity.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Cursor.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Ai_other.list
@@ -64,6 +67,9 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Direct.li
 https://ruleset.skk.moe/List/ip/china_ip.conf
 https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Direct/Direct.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/China/China.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaASN/ChinaASN.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaIPs/ChinaIPs.list
 https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/cncidr.txt
 EXCLUDE: apple
@@ -93,6 +99,7 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Gemini.li
 [Google]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Google.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Google/Google.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GoogleFCM/GoogleFCM.list
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/google.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
 
@@ -113,18 +120,23 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [IP_Check]
 ./MyRule/IP_Check.conf
 
+[JetBrains]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Jetbrains/Jetbrains.list
+
 [JP]
 ./MyRule/JP.conf
 
 [LAN]
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/private.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/private.txt
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Lan/Lan.list
 https://ruleset.skk.moe/List/non_ip/lan.conf
 https://ruleset.skk.moe/List/ip/lan.conf
 
 [Line]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Line.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Line/Line.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/LineTV/LineTV.list
 
 [LinkedIn]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/LinkedIn/LinkedIn.list
@@ -234,6 +246,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 
 [SpeedTest]
 https://ruleset.skk.moe/List/domainset/speedtest.conf
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Speedtest/Speedtest.list
 
 [Spotify]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Spotify/Spotify.list
