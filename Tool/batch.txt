@@ -232,7 +232,6 @@ EXCLUDE: whatsapp
 EXCLUDE: discord
 EXCLUDE: telegram
 EXCLUDE: cloudflare
-EXCLUDE: github\.com$
 EXCLUDE: githubcopilot\.com$
 
 [Rakuten]
