@@ -218,7 +218,8 @@ def clean_rule(line: str) -> str | None:
     1. 去除首尾空字符
     2. 空行 或 非指定类别开头 → 直接删除（返回 None）
     3. 去除行内注释（[空字符+注释符]结构及其后内容）
-    4. 补全 no-resolve
+    4. 去除逗号前后空格
+    5. 补全 no-resolve
     """
     # 步骤 1：去除首尾空字符
     line = line.strip()
@@ -248,7 +249,10 @@ def clean_rule(line: str) -> str | None:
     if not line:
         return None
 
-    # 步骤 4：补全 no-resolve（仅针对需要的规则类型）
+    # 步骤 4：去除逗号前后空格
+    line = re.sub(r"\s*,\s*", ",", line)
+
+    # 步骤 5：补全 no-resolve（仅针对需要的规则类型）
     if "," in line:
         rule_type = line.split(",")[0].strip()
         if rule_type in NEED_NO_RESOLVE:

@@ -203,7 +203,10 @@ def clean_rule(line: str) -> str | None:
     if not line:
         return None
 
-    # 步骤4: logical rule 特殊处理
+    # 步骤4: 去除逗号前后空格
+    line = re.sub(r"\s*,\s*", ",", line)
+
+    # 步骤5: logical rule 特殊处理
     if "," in line:
         prefix = line.split(",")[0].strip()
         if prefix in LOGICAL_PREFIXES:
@@ -212,7 +215,7 @@ def clean_rule(line: str) -> str | None:
                 return None  # 丢弃：无字段 / 混用 / 含未知字段
             return line
 
-    # 步骤5: 普通规则补全 no-resolve
+    # 步骤6: 普通规则补全 no-resolve
     if "," in line:
         rule_type = line.split(",")[0].strip()
         if rule_type in NEED_NO_RESOLVE:
