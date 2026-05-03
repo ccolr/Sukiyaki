@@ -215,6 +215,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 
 [Proxy]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Other.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Proxy/Proxy_All_No_Resolve.list
 https://ruleset.skk.moe/List/non_ip/global.conf
 EXCLUDE: apple
 EXCLUDE: google
@@ -229,7 +230,28 @@ EXCLUDE: googleapis\.com$
 EXCLUDE: doubleclick
 EXCLUDE: amazon
 EXCLUDE: aws
+EXCLUDE: openai
+EXCLUDE: chatgpt
+EXCLUDE: anthropic
+EXCLUDE: claude
+EXCLUDE: gemini
+EXCLUDE: twitter
 EXCLUDE: facebook
+EXCLUDE: instagram
+EXCLUDE: reddit
+EXCLUDE: twitch
+EXCLUDE: nintendo
+EXCLUDE: sony
+EXCLUDE: steam
+EXCLUDE: tiktok
+EXCLUDE: paypal
+EXCLUDE: netflix
+EXCLUDE: abema
+EXCLUDE: hbo
+EXCLUDE: disney
+EXCLUDE: oracle
+EXCLUDE: ebay
+EXCLUDE: stripe
 EXCLUDE: whatsapp
 EXCLUDE: discord
 EXCLUDE: telegram
