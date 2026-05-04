@@ -223,6 +223,7 @@ EXCLUDE: chrome
 EXCLUDE: youtube
 EXCLUDE: gmail
 EXCLUDE: android
+EXCLUDE: waze
 EXCLUDE: goog$
 EXCLUDE: gle$
 EXCLUDE: go\.dev$
