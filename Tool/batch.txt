@@ -95,6 +95,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/12306/12306.list
 https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/cncidr.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/cncidr.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/direct.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/direct.txt
 EXCLUDE: apple
 EXCLUDE: microsoft
 EXCLUDE: steam
@@ -216,6 +219,10 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [Proxy]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Other.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Proxy/Proxy_All_No_Resolve.list
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/proxy.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/proxy.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/gfw.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/gfw.txt
 https://ruleset.skk.moe/List/non_ip/global.conf
 EXCLUDE: apple
 EXCLUDE: google
@@ -287,6 +294,8 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdvertisingTest/AdvertisingTest_All_No_Resolve.list
 https://ruleset.skk.moe/List/domainset/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject.conf
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/reject.txt
+https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/reject.txt
 EXCLUDE: juejin\.cn$
 EXCLUDE: awstrack\.me$
 EXCLUDE: googleapis\.com$
