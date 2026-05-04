@@ -238,6 +238,7 @@ EXCLUDE: googleapis\.com$
 EXCLUDE: doubleclick
 EXCLUDE: amazon
 EXCLUDE: aws
+EXCLUDE: microsoft
 EXCLUDE: openai
 EXCLUDE: chatgpt
 EXCLUDE: anthropic
@@ -260,10 +261,20 @@ EXCLUDE: disney
 EXCLUDE: oracle
 EXCLUDE: ebay
 EXCLUDE: stripe
+EXCLUDE: line
 EXCLUDE: whatsapp
 EXCLUDE: discord
+EXCLUDE: tumblr
 EXCLUDE: telegram
 EXCLUDE: cloudflare
+EXCLUDE: adobe
+EXCLUDE: jetbrains
+EXCLUDE: spotify
+EXCLUDE: rakuten
+EXCLUDE: pixiv
+EXCLUDE: linkedin
+EXCLUDE: pikpak
+EXCLUDE: \.ai$
 EXCLUDE: githubcopilot\.com$
 
 [Rakuten]
