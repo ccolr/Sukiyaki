@@ -178,10 +178,6 @@
 ./Rule/Sony.conf
 ./MyRule/Sony.conf
 
-[Special]
-./Rule/Special.conf
-./MyRule/Special.conf
-
 [SpeedTest]
 ./Rule/SpeedTest.conf
 ./MyRule/SpeedTest.conf

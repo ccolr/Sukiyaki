@@ -280,9 +280,6 @@ EXCLUDE: googleapis\.com$
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Sony/Sony.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PlayStation/PlayStation.list
 
-[Special]
-./MyRule/Special.conf
-
 [SpeedTest]
 https://ruleset.skk.moe/List/domainset/speedtest.conf
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Speedtest/Speedtest.list
