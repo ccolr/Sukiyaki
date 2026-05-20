@@ -54,6 +54,10 @@
 ./Rule/Disney.conf
 ./MyRule/Disney.conf
 
+[Dropbox]
+./Rule/Dropbox.conf
+./MyRule/Dropbox.conf
+
 [eBay]
 ./Rule/eBay.conf
 ./MyRule/eBay.conf
