@@ -116,6 +116,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [eBay]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/eBay/eBay.list
 
+[Epic]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Epic/Epic.list
+
 [Facebook]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Facebook.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/MetaPlatforms.list

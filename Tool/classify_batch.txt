@@ -62,6 +62,10 @@
 ./Rule/eBay.conf
 ./MyRule/eBay.conf
 
+[Epic]
+./Rule/Epic.conf
+./MyRule/Epic.conf
+
 [Facebook]
 ./Rule/Facebook.conf
 ./MyRule/Facebook.conf
