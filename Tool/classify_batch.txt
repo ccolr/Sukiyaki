@@ -162,6 +162,10 @@
 ./Rule/PikPak.conf
 ./MyRule/PikPak.conf
 
+[Pinterest]
+./Rule/Pinterest.conf
+./MyRule/Pinterest.conf
+
 [Pixiv]
 ./Rule/Pixiv.conf
 ./MyRule/Pixiv.conf

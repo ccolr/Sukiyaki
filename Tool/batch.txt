@@ -222,6 +222,9 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Paypal.li
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PikPak/PikPak.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/PikPak.list
 
+[Pinterest]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Pinterest/Pinterest.list
+
 [Pixiv]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Pixiv/Pixiv.list
 
