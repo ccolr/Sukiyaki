@@ -58,6 +58,10 @@
 ./Rule/Dropbox.conf
 ./MyRule/Dropbox.conf
 
+[DuckDuckGo]
+./Rule/Duckduckgo.conf
+./MyRule/Duckduckgo.conf
+
 [eBay]
 ./Rule/eBay.conf
 ./MyRule/eBay.conf
