@@ -350,9 +350,7 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitter.l
 ./MyRule/UltraMobile.conf
 
 [US]
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Verizon/Verizon.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/VISA/VISA.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/DiscoveryPlus/DiscoveryPlus.list
+./MyRule/US.conf
 
 [VOA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/VOA/VOA.list
