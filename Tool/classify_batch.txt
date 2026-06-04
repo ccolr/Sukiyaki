@@ -254,6 +254,10 @@
 ./Rule/US.conf
 ./MyRule/US.conf
 
+[Vercel]
+./Rule/Vercel.conf
+./MyRule/Vercel.conf
+
 [VOA]
 ./Rule/VOA.conf
 ./MyRule/VOA.conf

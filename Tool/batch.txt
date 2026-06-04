@@ -352,6 +352,9 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitter.l
 [US]
 ./MyRule/US.conf
 
+[Vercel]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Vercel/Vercel.list
+
 [VOA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/VOA/VOA.list
 
