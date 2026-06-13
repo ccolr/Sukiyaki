@@ -190,6 +190,10 @@
 ./Rule/Reject.conf
 ./MyRule/Reject.conf
 
+[Snapchat]
+./Rule/Snapchat.conf
+./MyRule/Snapchat.conf
+
 [Sony]
 ./Rule/Sony.conf
 ./MyRule/Sony.conf

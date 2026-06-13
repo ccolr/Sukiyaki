@@ -289,6 +289,9 @@ EXCLUDE: juejin\.cn$
 EXCLUDE: awstrack\.me$
 EXCLUDE: googleapis\.com$
 
+[Snapchat]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Snap/Snap.list
+
 [Sony]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Sony/Sony.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PlayStation/PlayStation.list
