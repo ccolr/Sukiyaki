@@ -22,6 +22,7 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Perplexit
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Cursor.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Ai_other.list
 https://ruleset.skk.moe/List/non_ip/ai.conf
+EXCLUDE: notion
 
 [Amazon]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Amazon/Amazon.list
