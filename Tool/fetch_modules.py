@@ -14,13 +14,13 @@ surge_modules.txt 格式:
 
     [Modified]
     <url> [<newname>]
-    add: <整行内容>             # 在文件末尾追加一行
-    delete: <整行内容>          # 删除内容匹配的行 (子串匹配)
-    replace: <原内容> <新内容>  # 将「原内容」子串替换为「新内容」
+    ADD: <整行内容>             # 在文件末尾追加一行
+    DELETE: <整行内容>          # 删除内容匹配的行 (子串匹配)
+    REPLACE: <原内容> <新内容>  # 将「原内容」子串替换为「新内容」
     <url> [<newname>]           # 下一个模块条目
     ...
 
-add / delete / replace 可任意出现 (含多条), 出现哪条就按哪条改。
+ADD / DELETE / REPLACE 可任意出现 (含多条), 出现哪条就按哪条改。
 """
 
 import argparse
@@ -120,15 +120,14 @@ def parse_modules_file(path: str):
             originals.append((url, name.strip() or None))
 
         elif section == "modified":
-            lower = line.lower()
-            if lower.startswith(("add:", "delete:", "replace:")):
+            if line.upper().startswith(("ADD:", "DELETE:", "REPLACE:")):
                 if current_mod is None:
                     print(f"[警告] 修改规则没有对应的模块, 已忽略: {line}", file=sys.stderr)
                     continue
                 op, _, value = line.partition(":")
                 value = value.strip()
                 if value:
-                    current_mod.append((op.strip().lower(), value))
+                    current_mod.append((op.strip().upper(), value))
             else:
                 url, _, name = line.partition(" ")
                 mods: list[tuple[str, str]] = []
@@ -142,21 +141,21 @@ def apply_modifications(content: str, mods: list[tuple[str, str]]) -> str:
     """按顺序应用 add / delete / replace 规则。"""
     lines = content.splitlines()
     for op, value in mods:
-        if op == "add":
+        if op == "ADD":
             lines.append(value)
-            print(f"    [add] 追加: {value}")
-        elif op == "delete":
+            print(f"    [ADD] 追加: {value}")
+        elif op == "DELETE":
             before = len(lines)
             lines = [ln for ln in lines if value not in ln]
-            print(f"    [delete] 删除 {before - len(lines)} 行 (匹配: {value})")
-        elif op == "replace":
+            print(f"    [DELETE] 删除 {before - len(lines)} 行 (匹配: {value})")
+        elif op == "REPLACE":
             orig, _, repl = value.partition(" ")
             repl = repl.strip()
             text = "\n".join(lines)
             count = text.count(orig)
             text = text.replace(orig, repl)
             lines = text.splitlines()
-            print(f"    [replace] 替换 {count} 处: {orig} -> {repl}")
+            print(f"    [REPLACE] 替换 {count} 处: {orig} -> {repl}")
     return "\n".join(lines) + "\n"
 
 

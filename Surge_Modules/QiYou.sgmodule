@@ -1,0 +1,11 @@
+#!name=面板-汽油价格
+#!desc=展示当地汽油价格
+#!category=🌸 Sukiyaki
+#!arguments=省份拼音:shandong
+#!arguments-desc=🔔提示：山西省填写shanxi，陕西省填写shanxi-3
+
+[Panel]
+QiYou = script-name=QiYou,update-interval=43200
+
+[Script]
+QiYou = type=generic,timeout=5,script-path=https://sukiyaki.cco.moe/Surge_Modules/youjia.js,argument={{{省份拼音}}}

@@ -7,6 +7,6 @@ https://raw.githubusercontent.com/cc63/Surge/main/Module/Panel/QiYou/Moore/YJ.js
 
 [Modified]
 https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.sgmodule
-replace: https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.js https://sukiyaki.cco.moe/Surge_Modules/CFGPT.js
+REPLACE: https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.js https://sukiyaki.cco.moe/Surge_Modules/CFGPT.js
 https://raw.githubusercontent.com/cc63/Surge/main/Module/Panel/QiYou/Moore/QiYou.sgmodule
-replace: https://raw.githubusercontent.com/cc63/Surge/main/Module/Panel/QiYou/Moore/YJ.js https://sukiyaki.cco.moe/Surge_Modules/youjia.js
+REPLACE: https://raw.githubusercontent.com/cc63/Surge/main/Module/Panel/QiYou/Moore/YJ.js https://sukiyaki.cco.moe/Surge_Modules/youjia.js
