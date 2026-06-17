@@ -10,6 +10,8 @@ on:
       - "Tool/batch.txt"
       - "Tool/surge_classify.py"
       - "Tool/surge_merge.py"
+      - "Tool/surge_modules.txt"
+      - "Tool/fetch_modules.py"
   workflow_dispatch:
 
 jobs:
@@ -56,12 +58,24 @@ jobs:
             -b Tool/classify_batch.txt \
             -o ../Rule
 
+      - name: 拉取 Surge 模块到 Surge_Modules/
+        working-directory: Sukiyaki
+        run: |
+          python3 Tool/fetch_modules.py \
+            -i Tool/surge_modules.txt \
+            -o ./Surge_Modules
+
+      - name: 同步 Surge_Modules/ 到 Rule 仓库
+        run: |
+          mkdir -p Rule/Surge_Modules
+          rsync -a --delete Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
+
       - name: 推送到 Rule 仓库
         run: |
           cd Rule
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Surge/
+          git add Surge/ Surge_Modules/
           git diff --cached --quiet && echo "无变更, 跳过推送" && exit 0
           git commit -m "Auto-build: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
           git push

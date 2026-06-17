@@ -2,3 +2,4 @@
 /.vscode
 .python-version
 CLAUDE.md
+/Tool/__pycache__

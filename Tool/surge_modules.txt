@@ -1,0 +1,9 @@
+[Original]
+https://ruleset.skk.moe/Modules/sukka_common_always_realip.sgmodule sukka_realip
+https://ruleset.skk.moe/Modules/sukka_local_dns_mapping.sgmodule sukka_dns_mapping
+https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.js
+https://raw.githubusercontent.com/cc63/Surge/main/Module/Panel/Sub-info/Moore/Sub-info.js
+
+[Modified]
+https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.sgmodule
+replace: https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.js https://sukiyaki.cco.moe/Surge_Modules/CFGPT.js
