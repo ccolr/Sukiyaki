@@ -68,7 +68,7 @@ jobs:
       - name: 同步 Surge_Modules/ 到 Rule 仓库
         run: |
           mkdir -p Rule/Surge_Modules
-          rsync -a --delete Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
+          rsync -a Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
 
       - name: 推送到 Rule 仓库
         run: |
