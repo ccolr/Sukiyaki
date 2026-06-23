@@ -74,6 +74,10 @@
 ./Rule/Facebook.conf
 ./MyRule/Facebook.conf
 
+[GB]
+./Rule/GB.conf
+./MyRule/GB.conf
+
 [Gemini]
 ./Rule/Gemini.conf
 ./MyRule/Gemini.conf
