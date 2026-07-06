@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Surge Rule Classifier
-功能: 合并多个规则源, 清洗去重后按类型拆分为 domains/non_ip/ip 三类
-     分别推送至 ccolr/Rule 仓库的 Surge/domains, Surge/non_ip, Surge/ip 目录
+Purpose: merge multiple rule sources, clean and deduplicate, then split by type into domains/non_ip/ip
+     and push each to the Surge/domains, Surge/non_ip, Surge/ip directories of the ccolr/Rule repo
 """
 
 import re
@@ -15,9 +15,9 @@ import time
 from datetime import datetime, timezone
 
 # ============================================================
-# 规则分类定义
+# Rule classification definitions
 # ============================================================
-DOMAIN_ONLY_PREFIXES = set()  # 纯域名, 无前缀字段
+DOMAIN_ONLY_PREFIXES = set()  # plain domain, no prefix field
 
 NON_IP_PREFIXES = {
     "SUBNET",
@@ -47,41 +47,41 @@ IP_PREFIXES = {
 
 NEED_NO_RESOLVE = {"IP-CIDR", "IP-CIDR6", "GEOIP", "IP-ASN"}
 
-ALL_KNOWN_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES  # logical rule 内部字段白名单
+ALL_KNOWN_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES  # whitelist of inner fields for logical rules
 
 VALID_PREFIXES = NON_IP_PREFIXES | IP_PREFIXES | LOGICAL_PREFIXES
 
 _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*$")
 
-# 行内注释匹配：「一个或多个空白字符」+「注释符(# ; //)」+「后面所有内容」
+# Inline comment match: "one or more whitespace" + "comment marker (# ; //)" + "everything after"
 _INLINE_COMMENT_RE = re.compile(r"\s+(#|;|//).*$")
 
-# 匹配括号内单条子规则，第三字段只接受 no-resolve 或 extended-matching
-# group(1)=TYPE  group(2)=VALUE  group(3)=第三字段(含逗号) 或 None
+# Match a single sub-rule inside parentheses; the third field only accepts no-resolve or extended-matching
+# group(1)=TYPE  group(2)=VALUE  group(3)=third field (with comma) or None
 _LOGICAL_INNER_RULE_RE = re.compile(
     r"\(([A-Z0-9\-]+),([^,)]+)(,no-resolve|,extended-matching)?\)",
     re.IGNORECASE,
 )
 
-# 用于检测括号内是否存在格式非法的子规则（第三字段既不是合法值也不是空）
-# 即形如 (TYPE,VALUE,其他任意内容) 的情况
+# Detect whether an invalid-format sub-rule exists inside parentheses (third field is neither a valid value nor empty),
+# i.e. the form (TYPE,VALUE,any other content)
 _LOGICAL_INNER_ILLEGAL_RE = re.compile(
     r"\([^)]+,[^,)]+,(?!no-resolve\)|extended-matching\))[^)]+\)",
     re.IGNORECASE,
 )
 
 # ============================================================
-# 排除规则列表
+# Exclude list
 # ============================================================
 EXCLUDE_RULES: list[str] = [
-    # --- 在下方填写要排除的规则 (正则表达式, 大小写不敏感) ---
+    # --- add rules to exclude below (regular expressions, case-insensitive) ---
     r"7h1s_rul35et_i5_mad3_by_5ukk4w",
-    # --- 结束 ---
+    # --- end ---
 ]
 
 
 # ============================================================
-# 清洗逻辑
+# Cleaning logic
 # ============================================================
 
 
@@ -98,14 +98,14 @@ def _extract_logical_inner_prefixes(rule: str) -> set[str]:
 
 def _fix_logical_no_resolve(rule: str) -> str | None:
     """
-    校验并补全 logical rule 括号内的第三字段：
-    - ip TYPE 缺 no-resolve → 补全
-    - ip TYPE 带 extended-matching → 丢弃（返回 None）
-    - non_ip TYPE 带 no-resolve → 丢弃（返回 None）
-    - non_ip TYPE 带 extended-matching 或无第三字段 → 保留原样
-    - 第三字段是非法值 → 丢弃（返回 None）
+    Validate and complete the third field inside a logical rule's parentheses:
+    - ip TYPE missing no-resolve -> append it
+    - ip TYPE with extended-matching -> discard (return None)
+    - non_ip TYPE with no-resolve -> discard (return None)
+    - non_ip TYPE with extended-matching or no third field -> keep as-is
+    - third field is an invalid value -> discard (return None)
     """
-    # 先检测是否存在非法第三字段（不属于 no-resolve/extended-matching 的情况）
+    # First detect whether an invalid third field exists (anything other than no-resolve/extended-matching)
     if _LOGICAL_INNER_ILLEGAL_RE.search(rule):
         return None
 
@@ -116,19 +116,19 @@ def _fix_logical_no_resolve(rule: str) -> str | None:
 
         if type_field in IP_PREFIXES:
             if third is not None and third.lower() == ",extended-matching":
-                # ip TYPE 不能带 extended-matching
+                # ip TYPE cannot carry extended-matching
                 raise _LogicalRuleInvalid()
-            # 缺 no-resolve 则补全
+            # Append no-resolve if missing
             return f"({m.group(1)},{value},no-resolve)"
 
         if type_field in NON_IP_PREFIXES:
             if third is not None and third.lower() == ",no-resolve":
-                # non_ip TYPE 不能带 no-resolve
+                # non_ip TYPE cannot carry no-resolve
                 raise _LogicalRuleInvalid()
-            # 保留原样（有无 extended-matching 都合法）
+            # Keep as-is (valid with or without extended-matching)
             return m.group(0)
 
-        # LOGICAL_PREFIXES 本身嵌套，不处理
+        # LOGICAL_PREFIXES themselves are nested, not processed here
         return m.group(0)
 
     try:
@@ -138,17 +138,17 @@ def _fix_logical_no_resolve(rule: str) -> str | None:
 
 
 class _LogicalRuleInvalid(Exception):
-    """用于在 re.sub replacer 内部中断处理的哨兵异常"""
+    """Sentinel exception used to abort processing inside the re.sub replacer."""
 
     pass
 
 
 def _classify_logical_rule(rule: str) -> str | None:
     """
-    返回 "non_ip" / "ip" / None(丢弃)
-    此函数只判断归属，不做补全，补全在 merge_and_clean 排除后进行
+    Return "non_ip" / "ip" / None (discard).
+    This function only decides the category; it does not complete fields — that happens after exclusion in merge_and_clean.
     """
-    # 含非法第三字段格式 → 丢弃
+    # Contains an invalid third-field format -> discard
     if _LOGICAL_INNER_ILLEGAL_RE.search(rule):
         return None
 
@@ -158,7 +158,7 @@ def _classify_logical_rule(rule: str) -> str | None:
     if not known:
         return None
 
-    # 含未知 TYPE → 丢弃
+    # Contains an unknown TYPE -> discard
     unknown_fields = known - NON_IP_PREFIXES - IP_PREFIXES
     if unknown_fields:
         return None
@@ -167,9 +167,9 @@ def _classify_logical_rule(rule: str) -> str | None:
     has_ip = bool(known & IP_PREFIXES)
 
     if has_non_ip and has_ip:
-        return None  # 混用
+        return None  # mixed
 
-    # 交叉校验第三字段与 TYPE 类别
+    # Cross-check the third field against the TYPE category
     for m in _LOGICAL_INNER_RULE_RE.finditer(rule):
         type_field = m.group(1).upper()
         third = m.group(3)
@@ -182,40 +182,40 @@ def _classify_logical_rule(rule: str) -> str | None:
 
 
 def clean_rule(line: str) -> str | None:
-    # 步骤1: 去除首尾空字符
+    # Step 1: strip leading/trailing whitespace
     line = line.strip()
 
-    # 步骤2: 空行或注释直接删除
+    # Step 2: drop blank lines and comments
     if not line:
         return None
     if line.startswith("#") or line.startswith(";") or line.startswith("//"):
         return None
     if "," in line:
-        prefix = line.split(",")[0].strip()  # 严格区分大小写
+        prefix = line.split(",")[0].strip()  # case-sensitive
         if prefix not in VALID_PREFIXES:
             return None
     else:
         if not _PLAIN_DOMAIN_RE.match(line):
             return None
 
-    # 步骤3: 去除行内注释
+    # Step 3: strip inline comments
     line = _INLINE_COMMENT_RE.sub("", line).strip()
     if not line:
         return None
 
-    # 步骤4: 去除逗号前后空格
+    # Step 4: strip whitespace around commas
     line = re.sub(r"\s*,\s*", ",", line)
 
-    # 步骤5: logical rule 特殊处理
+    # Step 5: special handling for logical rules
     if "," in line:
         prefix = line.split(",")[0].strip()
         if prefix in LOGICAL_PREFIXES:
             category = _classify_logical_rule(line)
             if category is None:
-                return None  # 丢弃：无字段 / 混用 / 含未知字段
+                return None  # discard: no fields / mixed / contains unknown fields
             return line
 
-    # 步骤6: 普通规则补全 no-resolve
+    # Step 6: append no-resolve for normal rules
     if "," in line:
         rule_type = line.split(",")[0].strip()
         if rule_type in NEED_NO_RESOLVE:
@@ -225,25 +225,25 @@ def clean_rule(line: str) -> str | None:
 
 
 # ============================================================
-# 拉取
+# Fetching
 # ============================================================
 
 
 MAX_RETRIES = 3
-RETRY_DELAY = 5  # 秒，每次重试间隔
+RETRY_DELAY = 5  # seconds between retries
 
 
 def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY) -> list[str] | None:
-    print(f"  正在读取: {url}")
+    print(f"  Fetching: {url}")
     if not url.startswith("http://") and not url.startswith("https://"):
         if not os.path.isfile(url):
-            print(f"  [错误] 本地文件不存在: {url}", file=sys.stderr)
+            print(f"  [error] local file not found: {url}", file=sys.stderr)
             return None
         try:
             with open(url, "r", encoding="utf-8") as f:
                 return f.read().splitlines()
         except Exception as e:
-            print(f"  [错误] 读取本地文件失败 {url}: {e}", file=sys.stderr)
+            print(f"  [error] failed to read local file {url}: {e}", file=sys.stderr)
             return None
 
     for attempt in range(1, retries + 1):
@@ -256,28 +256,28 @@ def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY
                 except UnicodeDecodeError:
                     text = raw.decode("latin-1")
                 if attempt > 1:
-                    print(f"  [重试成功] 第 {attempt} 次尝试成功: {url}")
+                    print(f"  [retry ok] succeeded on attempt {attempt}: {url}")
                 return text.splitlines()
         except urllib.error.HTTPError as e:
-            print(f"  [错误] HTTP {e.code}: {url}", file=sys.stderr)
+            print(f"  [error] HTTP {e.code}: {url}", file=sys.stderr)
             if 400 <= e.code < 500:
-                print(f"  [放弃] 客户端错误，不再重试", file=sys.stderr)
+                print(f"  [give up] client error, not retrying", file=sys.stderr)
                 return None
         except urllib.error.URLError as e:
-            print(f"  [错误] 无法访问 (第 {attempt}/{retries} 次): {url} — {e.reason}", file=sys.stderr)
+            print(f"  [error] unreachable (attempt {attempt}/{retries}): {url} — {e.reason}", file=sys.stderr)
         except Exception as e:
-            print(f"  [错误] 未知错误 (第 {attempt}/{retries} 次): {url} — {e}", file=sys.stderr)
+            print(f"  [error] unknown error (attempt {attempt}/{retries}): {url} — {e}", file=sys.stderr)
 
         if attempt < retries:
-            print(f"  [重试] {delay} 秒后进行第 {attempt + 1} 次尝试...", file=sys.stderr)
+            print(f"  [retry] retrying in {delay}s (attempt {attempt + 1})...", file=sys.stderr)
             time.sleep(delay)
 
-    print(f"  [放弃] 已重试 {retries} 次，仍无法读取: {url}", file=sys.stderr)
+    print(f"  [give up] still failing after {retries} retries: {url}", file=sys.stderr)
     return None
 
 
 # ============================================================
-# 合并、清洗、去重
+# Merge, clean, deduplicate
 # ============================================================
 
 
@@ -294,17 +294,17 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         "final": 0,
     }
 
-    print(f"\n[1/4] 拉取 {len(urls)} 个规则源...")
+    print(f"\n[1/4] Fetching {len(urls)} rule sources...")
     all_lines = []
     for url in urls:
         lines = fetch_content(url)
         if lines is None:
-            print(f"\n[错误] 源 {url} 读取失败，终止当前任务以避免规则集不完整", file=sys.stderr)
+            print(f"\n[error] source {url} failed to load; aborting this task to avoid an incomplete rule set", file=sys.stderr)
             return None, stats
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/4] 清洗（去首尾空白 → 过滤非法行 → 去行内注释 → logical 规则校验 → 补全 no-resolve）...")
+    print(f"\n[2/4] Cleaning (strip whitespace -> filter invalid lines -> strip inline comments -> validate logical rules -> append no-resolve)...")
     cleaned = []
     for line in all_lines:
         result = clean_rule(line)
@@ -318,11 +318,11 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         try:
             global_patterns.append(re.compile(pattern_str, re.IGNORECASE))
         except re.error as e:
-            print(f"[警告] 全局排除规则正则有误 ({pattern_str!r}): {e}", file=sys.stderr)
+            print(f"[warning] invalid global exclude regex ({pattern_str!r}): {e}", file=sys.stderr)
     all_patterns = global_patterns + (group_excludes or [])
     stats["before_dedup"] = len(cleaned)
 
-    print(f"\n[3/4] 去重（严格区分大小写）...")
+    print(f"\n[3/4] Deduplicating (case-sensitive)...")
     seen: set[str] = set()
     deduped: list[str] = []
     for rule in cleaned:
@@ -331,7 +331,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
             deduped.append(rule)
     stats["after_dedup"] = len(deduped)
 
-    print(f"\n[4/4] 应用排除规则...")
+    print(f"\n[4/4] Applying exclude rules...")
     final: list[str] = []
     for rule in deduped:
         if any(p.search(rule) for p in all_patterns):
@@ -341,8 +341,8 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
         final.append(rule)
     stats["final"] = len(final)
 
-    # [5/5] 对存活的 logical rule 补全括号内 no-resolve（排除后再做，避免无效计算）
-    print(f"\n[5/5] 补全 logical rule 括号内 no-resolve...")
+    # [5/5] Append no-resolve inside surviving logical rules (done after exclusion to avoid wasted work)
+    print(f"\n[5/5] Appending no-resolve inside logical rules...")
     final = [
         _fix_logical_no_resolve(rule) if rule.split(",")[0].strip() in LOGICAL_PREFIXES else rule for rule in final
     ]
@@ -351,14 +351,14 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
 
 
 # ============================================================
-# 分类
+# Classification
 # ============================================================
 
 
 def classify_rules(rules: list[str]) -> tuple[list[str], list[str], list[str]]:
     """
-    返回 (domains, non_ip, ip)
-    logical rule (AND/OR/NOT) 根据内部字段归属到 non_ip 或 ip
+    Return (domains, non_ip, ip).
+    A logical rule (AND/OR/NOT) is assigned to non_ip or ip based on its inner fields.
     """
     domains, non_ip, ip = [], [], []
     for rule in rules:
@@ -369,12 +369,12 @@ def classify_rules(rules: list[str]) -> tuple[list[str], list[str], list[str]]:
         prefix = rule.split(",")[0].strip()
 
         if prefix in LOGICAL_PREFIXES:
-            # clean_rule 已校验通过，直接查归属
+            # Already validated by clean_rule, just look up the category
             category = _classify_logical_rule(rule)
             if category == "ip":
                 ip.append(rule)
             else:
-                non_ip.append(rule)  # "non_ip" 或意外的 None 都归 non_ip（理论上 None 不会到这里）
+                non_ip.append(rule)  # "non_ip" or an unexpected None both go to non_ip (None should not reach here)
         elif prefix in IP_PREFIXES:
             ip.append(rule)
         else:
@@ -419,7 +419,7 @@ def sort_classified(
     non_ip: list[str],
     ip: list[str],
 ) -> tuple[list[str], list[str], list[str]]:
-    """对 non_ip 和 ip 按规定顺序排序, domains 保持原序"""
+    """Sort non_ip and ip in the defined order; domains keep their original order."""
 
     def sort_by_order(rules: list[str], order: list[str]) -> list[str]:
         priority = {p: i for i, p in enumerate(order)}
@@ -429,7 +429,7 @@ def sort_classified(
 
 
 # ============================================================
-# 写出
+# Writing output
 # ============================================================
 
 
@@ -454,7 +454,7 @@ def write_classified(
 
     for category, rule_list in category_map.items():
         if not rule_list:
-            print(f"  [{category}] 为空, 跳过生成")
+            print(f"  [{category}] empty, skipping generation")
             continue
 
         out_dir = os.path.join(output_base, "Surge", category)
@@ -480,38 +480,38 @@ def write_classified(
             f.write("\n")
 
         written[category] = out_path
-        print(f"  [{category}] {len(rule_list)} 条 → {out_path}")
+        print(f"  [{category}] {len(rule_list)} rules -> {out_path}")
 
     return written
 
 
 def print_stats(stats: dict, name: str):
     print(f"{'=' * 50}")
-    print(f"  {name} 完成!")
+    print(f"  {name} complete!")
     print(f"{'=' * 50}")
-    print(f"  规则源数量        : {stats['sources']}")
-    print(f"  读取失败源        : {stats['failed_sources']}")
-    print(f"  原始总行数        : {stats['total_lines']}")
-    print(f"  清洗丢弃          : {stats['discarded']}")
-    print(f"  有效规则(去重前)  : {stats['before_dedup']}")
-    print(f"  有效规则(去重后)  : {stats['after_dedup']}")
-    print(f"  排除规则          : {stats['excluded']}")
+    print(f"  Rule sources          : {stats['sources']}")
+    print(f"  Failed sources        : {stats['failed_sources']}")
+    print(f"  Raw total lines       : {stats['total_lines']}")
+    print(f"  Discarded in cleaning : {stats['discarded']}")
+    print(f"  Valid rules (pre-dedup) : {stats['before_dedup']}")
+    print(f"  Valid rules (post-dedup): {stats['after_dedup']}")
+    print(f"  Excluded rules        : {stats['excluded']}")
     if stats.get("excluded_rules"):
         for r in stats["excluded_rules"]:
             print(f"    - {r}")
-    print(f"  有效规则(最终)    : {stats['final']}")
-    print(f"  重复去除          : {stats['before_dedup'] - stats['after_dedup']}")
+    print(f"  Valid rules (final)   : {stats['final']}")
+    print(f"  Duplicates removed    : {stats['before_dedup'] - stats['after_dedup']}")
     print(f"{'=' * 50}")
 
 
 # ============================================================
-# 批量配置解析
+# Batch config parsing
 # ============================================================
 
 
 def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Pattern]]]:
     if not os.path.isfile(batch_path):
-        print(f"[错误] 找不到批量配置文件: {batch_path}", file=sys.stderr)
+        print(f"[error] batch config file not found: {batch_path}", file=sys.stderr)
         sys.exit(1)
 
     groups = []
@@ -522,7 +522,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
 
     with open(batch_path, "r", encoding="utf-8") as f:
         for lineno, raw in enumerate(f, 1):
-            print(f"[调试] 第{lineno}行 repr: {repr(raw)}", file=sys.stderr)
+            print(f"[debug] line {lineno} repr: {repr(raw)}", file=sys.stderr)
             line = raw.strip()
             if not line or line.startswith("#"):
                 continue
@@ -530,7 +530,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
             if line.startswith("[") and line.endswith("]"):
                 if current_name is not None:
                     if not current_sources:
-                        print(f"[错误] 组别 [{current_name}] 没有任何规则源", file=sys.stderr)
+                        print(f"[error] group [{current_name}] has no rule sources", file=sys.stderr)
                         sys.exit(1)
                     groups.append((current_name, current_sources, current_excludes))
                 current_name = line[1:-1].strip()
@@ -541,7 +541,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
             elif line.startswith("EXCLUDE:"):
                 if phase == "sources" and not current_sources:
                     print(
-                        f"[错误] 第 {lineno} 行: 排除规则出现在任何源地址之前 (组别: {current_name})", file=sys.stderr
+                        f"[error] line {lineno}: exclude rule appears before any source (group: {current_name})", file=sys.stderr
                     )
                     sys.exit(1)
                 phase = "excludes"
@@ -553,53 +553,53 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
                     current_excludes.append(compiled)
                 except re.error as e:
                     print(
-                        f"[错误] 第 {lineno} 行: 正则表达式有误 ({pattern_str!r}): {e} (组别: {current_name})",
+                        f"[error] line {lineno}: invalid regular expression ({pattern_str!r}): {e} (group: {current_name})",
                         file=sys.stderr,
                     )
                     sys.exit(1)
 
             else:
                 if current_name is None:
-                    print(f"[错误] 第 {lineno} 行: 规则行出现在任何 [分组] 之前", file=sys.stderr)
+                    print(f"[error] line {lineno}: rule line appears before any [group]", file=sys.stderr)
                     sys.exit(1)
                 if phase == "excludes":
-                    print(f"[错误] 第 {lineno} 行: 源地址出现在排除规则之后 (组别: {current_name})", file=sys.stderr)
+                    print(f"[error] line {lineno}: source appears after exclude rules (group: {current_name})", file=sys.stderr)
                     sys.exit(1)
                 current_sources.append(line)
 
     if current_name is not None:
         if not current_sources:
-            print(f"[错误] 组别 [{current_name}] 没有任何规则源", file=sys.stderr)
+            print(f"[error] group [{current_name}] has no rule sources", file=sys.stderr)
             sys.exit(1)
         groups.append((current_name, current_sources, current_excludes))
 
     if not groups:
-        print("[错误] 批量配置文件中未找到任何有效分组", file=sys.stderr)
+        print("[error] no valid group found in the batch config file", file=sys.stderr)
         sys.exit(1)
 
     return groups
 
 
 # ============================================================
-# 入口
+# Entry point
 # ============================================================
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Surge 规则分类工具: 合并规则源, 拆分为 domains/non_ip/ip 三类输出")
+    parser = argparse.ArgumentParser(description="Surge rule classifier: merge rule sources, split into domains/non_ip/ip outputs")
     parser.add_argument(
         "-b",
         "--batch",
         required=True,
         metavar="BATCH_FILE",
-        help="批量配置文件路径",
+        help="path to the batch config file",
     )
     parser.add_argument(
         "-o",
         "--output-dir",
         required=True,
         metavar="DIR",
-        help="ccolr/Rule 仓库根目录路径",
+        help="path to the root of the ccolr/Rule repo",
     )
 
     args = parser.parse_args()
@@ -612,16 +612,16 @@ def main():
     success_count = 0
     for idx, (name, urls, group_excludes) in enumerate(tasks, 1):
         print(f"\n{'=' * 50}")
-        print(f"  任务 [{idx}/{total}]: {name}")
+        print(f"  Task [{idx}/{total}]: {name}")
         print(f"{'=' * 50}")
         rules, stats = merge_and_clean(urls, group_excludes)
 
         if rules is None:
-            print(f"[错误] 任务 {name} 因源读取失败而终止，跳过输出", file=sys.stderr)
+            print(f"[error] task {name} aborted due to a source load failure, skipping output", file=sys.stderr)
             continue
 
         if not rules:
-            print(f"[警告] {name} 合并结果为空, 跳过", file=sys.stderr)
+            print(f"[warning] {name} produced an empty result, skipping", file=sys.stderr)
             continue
 
         domains, non_ip, ip = classify_rules(rules)
@@ -631,7 +631,7 @@ def main():
         success_count += 1
 
     if total > 1:
-        print(f"\n全部完成, 成功处理 {success_count}/{total} 个组别")
+        print(f"\nAll done, successfully processed {success_count}/{total} group(s)")
 
 
 if __name__ == "__main__":

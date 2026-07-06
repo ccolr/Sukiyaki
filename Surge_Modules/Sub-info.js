@@ -1,31 +1,31 @@
 /**********
-* 作者：cc63&ChatGPT&Claude
-* 更新时间：2025年5月3日
+* Author: cc63 & ChatGPT & Claude
+* Updated: 2025-05-03
 **********/
 
 (async () => {
   try {
-    // 获取参数并处理数据
+    // Read arguments and process the data
     const args = getArgs();
     const info = await getDataInfo(args.url);
-    
-    // 如果没有信息，则直接结束
+
+    // If there is no info, finish immediately
     if (!info) return $done({});
 
-    // 处理重置日和到期日
+    // Handle the reset day and expiry date
     const resetDayLeft = args.reset_day ? getRemainingDays(parseInt(args.reset_day)) : null;
     const expireDate = args.expire || info.expire;
     const expireDaysLeft = getExpireDaysLeft(expireDate);
 
-    // 计算流量使用情况
+    // Compute data usage
     const used = info.download + info.upload;
     const total = info.total;
-    const content = [`用量：${bytesToSize(used)} / ${bytesToSize(total)}`];
+    const content = [`Usage: ${bytesToSize(used)} / ${bytesToSize(total)}`];
 
-    // 构建提示信息
+    // Build the notification lines
     buildNotifications(content, used, total, resetDayLeft, expireDaysLeft, expireDate);
 
-    // 返回结果
+    // Return the result
     $done({
       title: args.title,
       content: content.join("\n"),
@@ -33,10 +33,10 @@
       "icon-color": args.color || "#DF4688",
     });
   } catch (error) {
-    console.log(`发生错误: ${error}`);
+    console.log(`Error occurred: ${error}`);
     $done({
-      title: "订阅信息获取失败",
-      content: `错误信息: ${error}`,
+      title: "Failed to fetch subscription info",
+      content: `Error: ${error}`,
       icon: "exclamationmark.triangle",
       "icon-color": "#CB1B45",
     });
@@ -44,33 +44,33 @@
 })();
 
 /**
- * 构建通知内容
+ * Build the notification content
  */
 function buildNotifications(content, used, total, resetDayLeft, expireDaysLeft, expireDate) {
-  // 判断是否为不限时套餐
+  // Check whether this is an unlimited-time plan
   if (!resetDayLeft && !expireDaysLeft) {
     const percentage = ((used / total) * 100).toFixed(1);
-    content.push(`提醒：流量已使用${percentage}%`);
+    content.push(`Notice: ${percentage}% of data used`);
     return;
   }
-  
-  // 添加重置和到期提醒
+
+  // Add reset and expiry reminders
   if (resetDayLeft && expireDaysLeft) {
-    content.push(`提醒：${resetDayLeft}天后重置，${expireDaysLeft}天后到期`);
+    content.push(`Notice: resets in ${resetDayLeft} day(s), expires in ${expireDaysLeft} day(s)`);
   } else if (resetDayLeft) {
-    content.push(`提醒：流量将在${resetDayLeft}天后重置`);
+    content.push(`Notice: data resets in ${resetDayLeft} day(s)`);
   } else if (expireDaysLeft) {
-    content.push(`提醒：套餐将在${expireDaysLeft}天后到期`);
+    content.push(`Notice: plan expires in ${expireDaysLeft} day(s)`);
   }
-  
-  // 添加到期日期
+
+  // Add the expiry date
   if (expireDaysLeft) {
-    content.push(`到期：${formatTime(expireDate)}`);
+    content.push(`Expires: ${formatTime(expireDate)}`);
   }
 }
 
 /**
- * 解析参数
+ * Parse arguments
  */
 function getArgs() {
   return Object.fromEntries(
@@ -80,60 +80,60 @@ function getArgs() {
         const [key, value] = item.split("=");
         return [key, value ? decodeURIComponent(value) : null];
       })
-      .filter(([key]) => key) // 过滤无效参数
+      .filter(([key]) => key) // filter out invalid arguments
   );
 }
 
 /**
- * 获取用户信息
+ * Fetch user info
  */
 function getUserInfo(url) {
   if (!url) {
-    return Promise.reject("未提供有效的订阅链接");
+    return Promise.reject("No valid subscription link provided");
   }
-  
-  const request = { 
-    headers: { "User-Agent": "Quantumult%20X" }, 
-    url 
+
+  const request = {
+    headers: { "User-Agent": "Quantumult%20X" },
+    url
   };
-  
+
   return new Promise((resolve, reject) => {
     $httpClient.get(request, (err, resp) => {
       if (err) {
-        return reject(`网络请求错误: ${err}`);
+        return reject(`Network request error: ${err}`);
       }
-      
+
       if (resp.status !== 200) {
-        return reject(`服务器返回非200状态码: ${resp.status}`);
+        return reject(`Server returned a non-200 status code: ${resp.status}`);
       }
-      
+
       const header = Object.keys(resp.headers).find(
         (key) => key.toLowerCase() === "subscription-userinfo"
       );
-      
+
       if (header) {
         return resolve(resp.headers[header]);
       }
-      
-      reject("链接响应头不带有流量信息");
+
+      reject("Response headers do not include usage info");
     });
   });
 }
 
 /**
- * 获取数据信息
+ * Fetch and parse the data
  */
 async function getDataInfo(url) {
   try {
     const data = await getUserInfo(url);
-    
-    // 使用正则提取数据
+
+    // Extract data with a regex
     const matches = data.match(/\w+=[\d.eE+-]+/g);
     if (!matches || matches.length === 0) {
-      throw new Error("无法解析返回的数据");
+      throw new Error("Could not parse the returned data");
     }
-    
-    // 解析键值对
+
+    // Parse the key/value pairs
     return Object.fromEntries(
       matches.map((item) => {
         const [key, value] = item.split("=");
@@ -141,43 +141,43 @@ async function getDataInfo(url) {
       })
     );
   } catch (error) {
-    console.log(`获取数据失败: ${error}`);
+    console.log(`Failed to fetch data: ${error}`);
     return null;
   }
 }
 
 /**
- * 计算剩余天数
+ * Compute the days remaining until reset
  */
 function getRemainingDays(resetDay) {
-  // 验证重置日
+  // Validate the reset day
   if (!resetDay || resetDay < 1 || resetDay > 31) return null;
 
   const now = new Date();
   const today = now.getDate();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  
-  // 计算当月天数
+
+  // Days in the current month
   const daysInThisMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  
-  // 调整重置日，如果超出当月天数则使用当月最后一天
+
+  // Clamp the reset day to the last day of the month if it overflows
   const adjustedResetDay = Math.min(resetDay, daysInThisMonth);
-  
-  // 如果重置日在当月还未过
+
+  // If the reset day is still ahead this month
   if (adjustedResetDay > today) {
     return adjustedResetDay - today;
   }
-  
-  // 如果重置日已过，计算到下月重置日的天数
+
+  // If the reset day has passed, count the days to next month's reset day
   const daysInNextMonth = new Date(currentYear, currentMonth + 2, 0).getDate();
   const nextMonthResetDay = Math.min(resetDay, daysInNextMonth);
-  
+
   return daysInThisMonth - today + nextMonthResetDay;
 }
 
 /**
- * 计算到期剩余天数
+ * Compute the days remaining until expiry
  */
 function getExpireDaysLeft(expire) {
   if (!expire) return null;
@@ -185,18 +185,18 @@ function getExpireDaysLeft(expire) {
   const now = new Date().getTime();
   let expireTime;
 
-  // 处理时间戳或日期字符串
+  // Handle a timestamp or a date string
   if (typeof expire === 'number' || /^[\d.]+$/.test(expire)) {
-    // 确保时间戳为毫秒
+    // Ensure the timestamp is in milliseconds
     expireTime = parseInt(expire);
     if (expireTime < 1000000000000) {
-      expireTime *= 1000; // 如果是秒，转换为毫秒
+      expireTime *= 1000; // convert seconds to milliseconds
     }
   } else {
-    // 尝试解析日期字符串
+    // Try to parse the date string
     expireTime = new Date(expire).getTime();
     if (isNaN(expireTime)) {
-      console.log("无效的到期日期格式");
+      console.log("Invalid expiry date format");
       return null;
     }
   }
@@ -206,53 +206,53 @@ function getExpireDaysLeft(expire) {
 }
 
 /**
- * 字节转换为可读大小
+ * Convert bytes to a human-readable size
  */
 function bytesToSize(bytes) {
   if (bytes === 0) return "0B";
-  
+
   const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   const k = 1024;
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return (bytes / Math.pow(k, i)).toFixed(2) + " " + units[i];
 }
 
 /**
- * 格式化时间
+ * Format a time value
  */
 function formatTime(time) {
-  if (!time) return "未知日期";
-  
-  // 处理时间戳
+  if (!time) return "Unknown date";
+
+  // Handle a timestamp
   let timestamp = time;
   if (typeof time !== 'number' && /^[\d.]+$/.test(time)) {
     timestamp = parseInt(time);
   }
-  
-  // 确保时间戳为毫秒
+
+  // Ensure the timestamp is in milliseconds
   if (timestamp < 1000000000000) {
     timestamp *= 1000;
   }
-  
+
   try {
     const date = new Date(timestamp);
     if (isNaN(date.getTime())) {
-      // 尝试作为日期字符串解析
+      // Try parsing it as a date string
       const stringDate = new Date(time);
       if (isNaN(stringDate.getTime())) {
-        return "无效日期";
+        return "Invalid date";
       }
       date = stringDate;
     }
-    
+
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    
-    return `${year}年${month}月${day}日`;
+
+    return `${year}-${month}-${day}`;
   } catch (error) {
-    console.log(`日期格式化错误: ${error}`);
-    return "日期解析错误";
+    console.log(`Date formatting error: ${error}`);
+    return "Date parse error";
   }
 }

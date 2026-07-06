@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """
 Surge Module Fetcher
-功能: 根据 surge_modules.txt 拉取 Surge 模块/脚本到 Surge_Modules/ 目录
-      - [Original] 区块: 直接拉取, 可重命名
-      - [Modified] 区块: 拉取后按 add / delete / replace 规则修改, 可重命名
-      - 对 .sgmodule 文件统一注入 #!category=🌸 Sukiyaki
-用法: python fetch_modules.py [-i surge_modules.txt] [-o Surge_Modules]
+Purpose: fetch Surge modules/scripts into Surge_Modules/ based on surge_modules.txt
+      - [Original] block: fetch as-is, optional rename
+      - [Modified] block: fetch, then apply add / delete / replace rules, optional rename
+      - inject #!category=🌸 Sukiyaki into every .sgmodule file
+Usage: python fetch_modules.py [-i surge_modules.txt] [-o Surge_Modules]
 
-surge_modules.txt 格式:
+surge_modules.txt format:
     [Original]
-    <url>                       # 保持原文件名
-    <url> <newname>             # 重命名为 newname (无扩展名则沿用原扩展名)
+    <url>                       # keep original filename
+    <url> <newname>             # rename to newname (keeps original extension if none given)
 
     [Modified]
     <url> [<newname>]
-    ADD: <整行内容>             # 在文件末尾追加一行
-    DELETE: <整行内容>          # 删除内容匹配的行 (子串匹配)
-    REPLACE: <原内容> <新内容>  # 将「原内容」子串替换为「新内容」
-    <url> [<newname>]           # 下一个模块条目
+    ADD: <whole line>           # append a line at the end of the file
+    DELETE: <whole line>        # delete lines matching the content (substring match)
+    REPLACE: <old> <new>        # replace the "old" substring with "new"
+    <url> [<newname>]           # next module entry
     ...
 
-ADD / DELETE / REPLACE 可任意出现 (含多条), 出现哪条就按哪条改。
+ADD / DELETE / REPLACE may appear any number of times; each one is applied as it appears.
 """
 
 import argparse
@@ -34,12 +34,12 @@ CATEGORY_VALUE = "🌸 Sukiyaki"
 CATEGORY_LINE = f"#!category={CATEGORY_VALUE}"
 
 MAX_RETRIES = 3
-RETRY_DELAY = 5  # 秒
+RETRY_DELAY = 5  # seconds
 
 
 def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY) -> str | None:
-    """拉取 URL 内容, 返回原始文本 (失败返回 None)。"""
-    print(f"  正在拉取: {url}")
+    """Fetch URL content, returning the raw text (None on failure)."""
+    print(f"  Fetching: {url}")
     for attempt in range(1, retries + 1):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (surge-module-fetcher)"})
@@ -50,28 +50,28 @@ def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY
             except UnicodeDecodeError:
                 text = raw.decode("latin-1")
             if attempt > 1:
-                print(f"  [重试成功] 第 {attempt} 次尝试成功: {url}")
+                print(f"  [retry ok] succeeded on attempt {attempt}: {url}")
             return text
         except urllib.error.HTTPError as e:
-            print(f"  [错误] HTTP {e.code}: {url}", file=sys.stderr)
+            print(f"  [error] HTTP {e.code}: {url}", file=sys.stderr)
             if 400 <= e.code < 500:
-                print("  [放弃] 客户端错误, 不再重试", file=sys.stderr)
+                print("  [give up] client error, not retrying", file=sys.stderr)
                 return None
         except urllib.error.URLError as e:
-            print(f"  [错误] 无法访问 (第 {attempt}/{retries} 次): {url} — {e.reason}", file=sys.stderr)
+            print(f"  [error] unreachable (attempt {attempt}/{retries}): {url} — {e.reason}", file=sys.stderr)
         except Exception as e:
-            print(f"  [错误] 未知错误 (第 {attempt}/{retries} 次): {url} — {e}", file=sys.stderr)
+            print(f"  [error] unknown error (attempt {attempt}/{retries}): {url} — {e}", file=sys.stderr)
 
         if attempt < retries:
-            print(f"  [重试] {delay} 秒后进行第 {attempt + 1} 次尝试...", file=sys.stderr)
+            print(f"  [retry] retrying in {delay}s (attempt {attempt + 1})...", file=sys.stderr)
             time.sleep(delay)
 
-    print(f"  [放弃] 已重试 {retries} 次, 仍无法拉取: {url}", file=sys.stderr)
+    print(f"  [give up] still failing after {retries} retries: {url}", file=sys.stderr)
     return None
 
 
 def resolve_filename(url: str, newname: str | None) -> str:
-    """根据 URL 与可选重命名计算输出文件名 (重命名无扩展名时沿用原扩展名)。"""
+    """Compute the output filename from the URL and optional rename (keeps original extension if the rename has none)."""
     orig_base = os.path.basename(url.split("?", 1)[0].split("#", 1)[0])
     orig_ext = os.path.splitext(orig_base)[1]
     if not newname:
@@ -82,20 +82,20 @@ def resolve_filename(url: str, newname: str | None) -> str:
 
 
 def parse_modules_file(path: str):
-    """解析 surge_modules.txt, 返回 (originals, modified)。
+    """Parse surge_modules.txt, returning (originals, modified).
 
     originals: list[(url, newname|None)]
-    modified:  list[(url, newname|None, mods)]，mods = list[(op, value)]
+    modified:  list[(url, newname|None, mods)], mods = list[(op, value)]
     """
     if not os.path.isfile(path):
-        print(f"[错误] 找不到配置文件: {path}", file=sys.stderr)
+        print(f"[error] config file not found: {path}", file=sys.stderr)
         sys.exit(1)
 
     originals: list[tuple[str, str | None]] = []
     modified: list[tuple[str, str | None, list[tuple[str, str]]]] = []
 
     section = None  # "original" | "modified"
-    current_mod = None  # 指向 modified 列表中当前条目的 mods
+    current_mod = None  # points to the mods of the current entry in the modified list
 
     with open(path, "r", encoding="utf-8") as f:
         lines = f.read().splitlines()
@@ -122,7 +122,7 @@ def parse_modules_file(path: str):
         elif section == "modified":
             if line.upper().startswith(("ADD:", "DELETE:", "REPLACE:")):
                 if current_mod is None:
-                    print(f"[警告] 修改规则没有对应的模块, 已忽略: {line}", file=sys.stderr)
+                    print(f"[warning] modification rule has no module to attach to, ignored: {line}", file=sys.stderr)
                     continue
                 op, _, value = line.partition(":")
                 value = value.strip()
@@ -138,16 +138,16 @@ def parse_modules_file(path: str):
 
 
 def apply_modifications(content: str, mods: list[tuple[str, str]]) -> str:
-    """按顺序应用 add / delete / replace 规则。"""
+    """Apply the add / delete / replace rules in order."""
     lines = content.splitlines()
     for op, value in mods:
         if op == "ADD":
             lines.append(value)
-            print(f"    [ADD] 追加: {value}")
+            print(f"    [ADD] appended: {value}")
         elif op == "DELETE":
             before = len(lines)
             lines = [ln for ln in lines if value not in ln]
-            print(f"    [DELETE] 删除 {before - len(lines)} 行 (匹配: {value})")
+            print(f"    [DELETE] removed {before - len(lines)} line(s) (match: {value})")
         elif op == "REPLACE":
             orig, _, repl = value.partition(" ")
             repl = repl.strip()
@@ -155,22 +155,22 @@ def apply_modifications(content: str, mods: list[tuple[str, str]]) -> str:
             count = text.count(orig)
             text = text.replace(orig, repl)
             lines = text.splitlines()
-            print(f"    [REPLACE] 替换 {count} 处: {orig} -> {repl}")
+            print(f"    [REPLACE] replaced {count} occurrence(s): {orig} -> {repl}")
     return "\n".join(lines) + "\n"
 
 
 def inject_category(content: str) -> str:
-    """对 .sgmodule 内容注入/改写 #!category。"""
+    """Inject or rewrite #!category in .sgmodule content."""
     lines = content.splitlines()
 
-    # 1) 已存在 #!category -> 改写
+    # 1) #!category already present -> rewrite
     for i, ln in enumerate(lines):
         if ln.lstrip().startswith("#!category"):
             lines[i] = CATEGORY_LINE
-            print(f"    [category] 改写已有类别 -> {CATEGORY_VALUE}")
+            print(f"    [category] rewrote existing category -> {CATEGORY_VALUE}")
             return "\n".join(lines) + "\n"
 
-    # 2) 无 #!category -> 插入到 #!desc 之后, 否则 #!name 之后
+    # 2) no #!category -> insert after #!desc, otherwise after #!name
     desc_idx = next((i for i, ln in enumerate(lines) if ln.lstrip().startswith("#!desc")), None)
     name_idx = next((i for i, ln in enumerate(lines) if ln.lstrip().startswith("#!name")), None)
     insert_at = None
@@ -181,10 +181,10 @@ def inject_category(content: str) -> str:
 
     if insert_at is not None:
         lines.insert(insert_at, CATEGORY_LINE)
-        print(f"    [category] 新增类别 -> {CATEGORY_VALUE}")
+        print(f"    [category] added category -> {CATEGORY_VALUE}")
     else:
         lines.insert(0, CATEGORY_LINE)
-        print(f"    [category] 文件无 #!name/#!desc, 已置顶新增类别 -> {CATEGORY_VALUE}")
+        print(f"    [category] file has no #!name/#!desc, added category at top -> {CATEGORY_VALUE}")
     return "\n".join(lines) + "\n"
 
 
@@ -204,7 +204,7 @@ def write_module(url: str, newname: str | None, out_dir: str, mods: list[tuple[s
     out_path = os.path.join(out_dir, filename)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(content)
-    print(f"  [完成] -> {out_path}\n")
+    print(f"  [done] -> {out_path}\n")
     return True
 
 
@@ -212,11 +212,11 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     repo_root = os.path.dirname(script_dir)
 
-    parser = argparse.ArgumentParser(description="拉取并处理 Surge 模块到 Surge_Modules/")
+    parser = argparse.ArgumentParser(description="Fetch and process Surge modules into Surge_Modules/")
     parser.add_argument("-i", "--input", default=os.path.join(script_dir, "surge_modules.txt"),
-                        help="模块清单文件 (默认: Tool/surge_modules.txt)")
+                        help="module list file (default: Tool/surge_modules.txt)")
     parser.add_argument("-o", "--output", default=os.path.join(repo_root, "Surge_Modules"),
-                        help="输出目录 (默认: Surge_Modules/)")
+                        help="output directory (default: Surge_Modules/)")
     args = parser.parse_args()
 
     os.makedirs(args.output, exist_ok=True)
@@ -225,21 +225,21 @@ def main():
     ok = 0
     fail = 0
 
-    print(f"\n=== [Original] 共 {len(originals)} 个 ===")
+    print(f"\n=== [Original] {len(originals)} total ===")
     for url, name in originals:
         if write_module(url, name, args.output):
             ok += 1
         else:
             fail += 1
 
-    print(f"\n=== [Modified] 共 {len(modified)} 个 ===")
+    print(f"\n=== [Modified] {len(modified)} total ===")
     for url, name, mods in modified:
         if write_module(url, name, args.output, mods):
             ok += 1
         else:
             fail += 1
 
-    print(f"\n=== 完成: 成功 {ok} 个, 失败 {fail} 个, 输出目录: {args.output} ===")
+    print(f"\n=== Done: {ok} succeeded, {fail} failed, output directory: {args.output} ===")
     if fail:
         sys.exit(1)
 

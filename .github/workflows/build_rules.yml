@@ -32,55 +32,55 @@ jobs:
           token: ${{ secrets.RULE_REPO_TOKEN }}
           path: Rule
 
-      - name: 合并规则到本仓库 Rule/
+      - name: Merge rules into this repo's Rule/
         working-directory: Sukiyaki
         run: |
           python3 Tool/surge_merge.py \
             -b Tool/batch.txt \
             -o ./Rule
 
-      - name: 提交本仓库 Rule/ 变更
+      - name: Commit Rule/ changes in this repo
         working-directory: Sukiyaki
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Rule/
           if git diff --cached --quiet; then
-            echo "Rule/ 无变更, 跳过提交"
+            echo "Rule/ unchanged, skipping commit"
           else
             git commit -m "Auto-merge: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
             git push
           fi
 
-      - name: 构建规则集到外部 Rule 仓库
+      - name: Build rule sets into the external Rule repo
         working-directory: Sukiyaki
         run: |
           python3 Tool/surge_classify.py \
             -b Tool/classify_batch.txt \
             -o ../Rule
 
-      - name: 拉取 Surge 模块到 Surge_Modules/
+      - name: Fetch Surge modules into Surge_Modules/
         working-directory: Sukiyaki
         run: |
           python3 Tool/fetch_modules.py \
             -i Tool/surge_modules.txt \
             -o ./Surge_Modules
 
-      - name: 同步 Surge_Modules/ 到 Rule 仓库
+      - name: Sync Surge_Modules/ to the Rule repo
         run: |
           mkdir -p Rule/Surge_Modules
           rsync -a Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
 
-      - name: 推送到 Rule 仓库
+      - name: Push to the Rule repo
         run: |
           cd Rule
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Surge/ Surge_Modules/
-          git diff --cached --quiet && echo "无变更, 跳过推送" && exit 0
+          git diff --cached --quiet && echo "No changes, skipping push" && exit 0
           git commit -m "Auto-build: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
           git push
 
-      - name: 触发 Vercel 重新部署
+      - name: Trigger Vercel redeploy
         if: success()
         run: curl -X POST "${{ secrets.RULE_DEPLOY_HOOK }}"

@@ -1,6 +1,6 @@
 # Sukiyaki
 
-## 跪谢
+## Acknowledgements
 
 - [SukkaW/Surge](https://github.com/SukkaW/Surge)
 - [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)

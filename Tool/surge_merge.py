@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Surge Rule Merger
-功能: 合并多个 Surge 规则集文件 (.conf/.list), 清洗注释和空行, 去重, 输出 .conf 文件
-用法: python surge_merge.py -u <url1> <url2> ... -o <output_dir> -n <filename>
+Purpose: merge multiple Surge rule-set files (.conf/.list), strip comments and blank lines, deduplicate, output a .conf file
+Usage: python surge_merge.py -u <url1> <url2> ... -o <output_dir> -n <filename>
 """
 
 import re
@@ -14,30 +14,30 @@ import urllib.error
 import time
 
 # ============================================================
-# 排除规则列表 — 引号内写正则表达式
+# Exclude list — write regular expressions inside the quotes
 EXCLUDE_RULES: list[str] = [
-    # --- 在下方填写要排除的规则 (正则表达式, 大小写不敏感) ---
+    # --- add rules to exclude below (regular expressions, case-insensitive) ---
     r"7h1s_rul35et_i5_mad3_by_5ukk4w",
-    # --- 结束 ---
+    # --- end ---
 ]
 # ============================================================
 
 
 MAX_RETRIES = 3
-RETRY_DELAY = 5  # 秒，每次重试间隔
+RETRY_DELAY = 5  # seconds between retries
 
 
 def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY) -> list[str] | None:
-    print(f"  正在读取: {url}")
+    print(f"  Fetching: {url}")
     if not url.startswith("http://") and not url.startswith("https://"):
         if not os.path.isfile(url):
-            print(f"  [错误] 本地文件不存在: {url}", file=sys.stderr)
+            print(f"  [error] local file not found: {url}", file=sys.stderr)
             return None
         try:
             with open(url, "r", encoding="utf-8") as f:
                 return f.read().splitlines()
         except Exception as e:
-            print(f"  [错误] 读取本地文件失败 {url}: {e}", file=sys.stderr)
+            print(f"  [error] failed to read local file {url}: {e}", file=sys.stderr)
             return None
 
     for attempt in range(1, retries + 1):
@@ -50,30 +50,30 @@ def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY
                 except UnicodeDecodeError:
                     text = raw.decode("latin-1")
                 if attempt > 1:
-                    print(f"  [重试成功] 第 {attempt} 次尝试成功: {url}")
+                    print(f"  [retry ok] succeeded on attempt {attempt}: {url}")
                 return text.splitlines()
         except urllib.error.HTTPError as e:
-            print(f"  [错误] HTTP {e.code}: {url}", file=sys.stderr)
-            # 4xx 错误重试无意义，直接放弃
+            print(f"  [error] HTTP {e.code}: {url}", file=sys.stderr)
+            # retrying 4xx errors is pointless, give up immediately
             if 400 <= e.code < 500:
-                print(f"  [放弃] 客户端错误，不再重试", file=sys.stderr)
+                print(f"  [give up] client error, not retrying", file=sys.stderr)
                 return None
         except urllib.error.URLError as e:
-            print(f"  [错误] 无法访问 (第 {attempt}/{retries} 次): {url} — {e.reason}", file=sys.stderr)
+            print(f"  [error] unreachable (attempt {attempt}/{retries}): {url} — {e.reason}", file=sys.stderr)
         except Exception as e:
-            print(f"  [错误] 未知错误 (第 {attempt}/{retries} 次): {url} — {e}", file=sys.stderr)
+            print(f"  [error] unknown error (attempt {attempt}/{retries}): {url} — {e}", file=sys.stderr)
 
         if attempt < retries:
-            print(f"  [重试] {delay} 秒后进行第 {attempt + 1} 次尝试...", file=sys.stderr)
+            print(f"  [retry] retrying in {delay}s (attempt {attempt + 1})...", file=sys.stderr)
             time.sleep(delay)
 
-    print(f"  [放弃] 已重试 {retries} 次，仍无法读取: {url}", file=sys.stderr)
+    print(f"  [give up] still failing after {retries} retries: {url}", file=sys.stderr)
     return None
 
 
 def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Pattern]]]:
     if not os.path.isfile(batch_path):
-        print(f"[错误] 找不到批量配置文件: {batch_path}", file=sys.stderr)
+        print(f"[error] batch config file not found: {batch_path}", file=sys.stderr)
         sys.exit(1)
 
     groups = []
@@ -84,7 +84,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
 
     with open(batch_path, "r", encoding="utf-8") as f:
         for lineno, raw in enumerate(f, 1):
-            print(f"[调试] 第{lineno}行 repr: {repr(raw)}", file=sys.stderr)
+            print(f"[debug] line {lineno} repr: {repr(raw)}", file=sys.stderr)
             line = raw.strip()
             if not line or line.startswith("#"):
                 continue
@@ -92,7 +92,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
             if line.startswith("[") and line.endswith("]"):
                 if current_name is not None:
                     if not current_sources:
-                        print(f"[错误] 组别 [{current_name}] 没有任何规则源", file=sys.stderr)
+                        print(f"[error] group [{current_name}] has no rule sources", file=sys.stderr)
                         sys.exit(1)
                     groups.append((current_name, current_sources, current_excludes))
                 current_name = line[1:-1].strip()
@@ -103,7 +103,7 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
             elif line.startswith("EXCLUDE:"):
                 if phase == "sources" and not current_sources:
                     print(
-                        f"[错误] 第 {lineno} 行: 排除规则出现在任何源地址之前 (组别: {current_name})", file=sys.stderr
+                        f"[error] line {lineno}: exclude rule appears before any source (group: {current_name})", file=sys.stderr
                     )
                     sys.exit(1)
                 phase = "excludes"
@@ -115,34 +115,34 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
                     current_excludes.append(compiled)
                 except re.error as e:
                     print(
-                        f"[错误] 第 {lineno} 行: 正则表达式有误 ({pattern_str!r}): {e} (组别: {current_name})",
+                        f"[error] line {lineno}: invalid regular expression ({pattern_str!r}): {e} (group: {current_name})",
                         file=sys.stderr,
                     )
                     sys.exit(1)
 
             else:
                 if current_name is None:
-                    print(f"[错误] 第 {lineno} 行: 规则行出现在任何 [分组] 之前", file=sys.stderr)
+                    print(f"[error] line {lineno}: rule line appears before any [group]", file=sys.stderr)
                     sys.exit(1)
                 if phase == "excludes":
-                    print(f"[错误] 第 {lineno} 行: 源地址出现在排除规则之后 (组别: {current_name})", file=sys.stderr)
+                    print(f"[error] line {lineno}: source appears after exclude rules (group: {current_name})", file=sys.stderr)
                     sys.exit(1)
                 current_sources.append(line)
 
     if current_name is not None:
         if not current_sources:
-            print(f"[错误] 组别 [{current_name}] 没有任何规则源", file=sys.stderr)
+            print(f"[error] group [{current_name}] has no rule sources", file=sys.stderr)
             sys.exit(1)
         groups.append((current_name, current_sources, current_excludes))
 
     if not groups:
-        print("[错误] 批量配置文件中未找到任何有效分组", file=sys.stderr)
+        print("[error] no valid group found in the batch config file", file=sys.stderr)
         sys.exit(1)
 
     return groups
 
 
-# 合法的规则类型前缀（区分大小写，必须严格匹配）
+# Valid rule-type prefixes (case-sensitive, must match exactly)
 VALID_PREFIXES = {
     "SUBNET",
     "SRC-IP",
@@ -167,14 +167,14 @@ VALID_PREFIXES = {
     "IP-ASN",
 }
 
-# 纯域名：只允许字母/数字/"-"/"."，可以以"."开头
+# Plain domain: only letters/digits/"-"/".", may start with "."
 _PLAIN_DOMAIN_RE = re.compile(r"^\.?[a-zA-Z0-9][a-zA-Z0-9\-]*(\.[a-zA-Z0-9\-]+)*$")
 
-# 行内注释匹配：「一个或多个空白字符」+「注释符(# ; //)」+「后面所有内容」
-# 注释符必须紧跟在空白字符后面，防止误截断域名或规则内容中的 # 字符
+# Inline comment match: "one or more whitespace" + "comment marker (# ; //)" + "everything after"
+# The comment marker must immediately follow whitespace, to avoid truncating a "#" inside a domain or rule
 _INLINE_COMMENT_RE = re.compile(r"\s+(#|;|//).*$")
 
-# 规则类型优先级顺序
+# Rule-type priority order
 RULE_ORDER = [
     "SUBNET",
     "SRC-IP",
@@ -182,7 +182,7 @@ RULE_ORDER = [
     "IN-PORT",
     "DEST-PORT",
     "PROTOCOL",
-    "PLAIN_DOMAIN",  # 纯域名 / . 开头
+    "PLAIN_DOMAIN",  # plain domain / starts with .
     "DOMAIN",
     "DOMAIN-SUFFIX",
     "DOMAIN-KEYWORD",
@@ -204,8 +204,8 @@ NEED_NO_RESOLVE = {"IP-CIDR", "IP-CIDR6", "GEOIP", "IP-ASN"}
 
 
 def ensure_no_resolve(rule: str) -> str:
-    """为需要 no-resolve 的规则补全后缀（大小写严格，统一补全为小写 no-resolve）"""
-    # 检查时忽略大小写，但补全时统一使用小写
+    """Append the no-resolve suffix to rules that need it (case-sensitive, always appended as lowercase no-resolve)."""
+    # Check ignoring case, but always append using lowercase
     parts = rule.split(",")
     if parts[-1].strip().lower() != "no-resolve":
         return rule + ",no-resolve"
@@ -214,45 +214,45 @@ def ensure_no_resolve(rule: str) -> str:
 
 def clean_rule(line: str) -> str | None:
     """
-    严格按以下顺序处理每一行：
-    1. 去除首尾空字符
-    2. 空行 或 非指定类别开头 → 直接删除（返回 None）
-    3. 去除行内注释（[空字符+注释符]结构及其后内容）
-    4. 去除逗号前后空格
-    5. 补全 no-resolve
+    Process each line strictly in this order:
+    1. Strip leading/trailing whitespace
+    2. Blank line, or not starting with an allowed type -> drop (return None)
+    3. Strip inline comments ([whitespace + comment marker] structure and everything after)
+    4. Strip whitespace around commas
+    5. Append no-resolve
     """
-    # 步骤 1：去除首尾空字符
+    # Step 1: strip leading/trailing whitespace
     line = line.strip()
 
-    # 步骤 2：空行直接删除
+    # Step 2: drop blank lines
     if not line:
         return None
 
-    # 步骤 2：整行注释（行首就是注释符）→ 非指定类别，直接删除
+    # Step 2: whole-line comment (line starts with a comment marker) -> not an allowed type, drop
     if line.startswith("#") or line.startswith(";") or line.startswith("//"):
         return None
 
-    # 步骤 2：验证规则前缀（严格区分大小写，不做任何大小写转换）
+    # Step 2: validate the rule prefix (case-sensitive, no case conversion)
     if "," in line:
-        # 含逗号：取逗号前的部分作为前缀，严格匹配 VALID_PREFIXES
+        # Has a comma: take the part before the comma as the prefix, match VALID_PREFIXES exactly
         prefix = line.split(",")[0].strip()
         if prefix not in VALID_PREFIXES:
             return None
     else:
-        # 不含逗号：必须是合法的纯域名格式
+        # No comma: must be a valid plain-domain format
         if not _PLAIN_DOMAIN_RE.match(line):
             return None
 
-    # 步骤 3：去除行内注释
-    # 匹配「一个或多个空白」+「# 或 ; 或 //」+「之后所有内容」
+    # Step 3: strip inline comments
+    # Match "one or more whitespace" + "# or ; or //" + "everything after"
     line = _INLINE_COMMENT_RE.sub("", line).strip()
     if not line:
         return None
 
-    # 步骤 4：去除逗号前后空格
+    # Step 4: strip whitespace around commas
     line = re.sub(r"\s*,\s*", ",", line)
 
-    # 步骤 5：补全 no-resolve（仅针对需要的规则类型）
+    # Step 5: append no-resolve (only for rule types that need it)
     if "," in line:
         rule_type = line.split(",")[0].strip()
         if rule_type in NEED_NO_RESOLVE:
@@ -268,32 +268,32 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
         "total_lines": 0,
         "comment_or_empty": 0,
         "before_dedup": 0,
-        "after_dedup": 0,  # 去重后、排除前
+        "after_dedup": 0,  # after dedup, before exclusion
         "excluded": 0,
         "excluded_rules": [],
         "failed_sources": 0,
-        "final": 0,  # 排除后的最终数量
+        "final": 0,  # final count after exclusion
     }
 
-    # 全局排除规则转为正则
+    # Compile global exclude rules to regex
     global_patterns = []
     for pattern_str in EXCLUDE_RULES:
         try:
             global_patterns.append(re.compile(pattern_str, re.IGNORECASE))
         except re.error as e:
-            print(f"[警告] 全局排除规则正则有误 ({pattern_str!r}): {e}", file=sys.stderr)
+            print(f"[warning] invalid global exclude regex ({pattern_str!r}): {e}", file=sys.stderr)
     all_patterns = global_patterns + (group_excludes or [])
 
-    print(f"\n[1/5] 拉取 {len(urls)} 个规则源...")
+    print(f"\n[1/5] Fetching {len(urls)} rule sources...")
     for url in urls:
         lines = fetch_content(url)
         if lines is None:
-            print(f"\n[错误] 源 {url} 读取失败，终止当前任务以避免规则集不完整", file=sys.stderr)
+            print(f"\n[error] source {url} failed to load; aborting this task to avoid an incomplete rule set", file=sys.stderr)
             return None, stats
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/5] 清洗（去首尾空白 → 过滤非法行 → 去行内注释 → 补全 no-resolve）...")
+    print(f"\n[2/5] Cleaning (strip whitespace -> filter invalid lines -> strip inline comments -> append no-resolve)...")
     cleaned: list[str] = []
     for line in all_lines:
         result = clean_rule(line)
@@ -303,16 +303,16 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
             cleaned.append(result)
     stats["before_dedup"] = len(cleaned)
 
-    print(f"\n[3/5] 去重（严格区分大小写）...")
+    print(f"\n[3/5] Deduplicating (case-sensitive)...")
     seen: set[str] = set()
     deduped: list[str] = []
     for rule in cleaned:
         if rule not in seen:
             seen.add(rule)
             deduped.append(rule)
-    stats["after_dedup"] = len(deduped)  # ← 这里记录真正的去重后数量
+    stats["after_dedup"] = len(deduped)  # <- records the true post-dedup count
 
-    print(f"\n[4/5] 应用排除规则...")
+    print(f"\n[4/5] Applying exclude rules...")
     final: list[str] = []
     for rule in deduped:
         if any(p.search(rule) for p in all_patterns):
@@ -320,28 +320,28 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
             stats["excluded_rules"].append(rule)
             continue
         final.append(rule)
-    stats["final"] = len(final)  # ← 这里记录排除后数量
+    stats["final"] = len(final)  # <- records the post-exclusion count
 
-    print(f"\n[5/5] 按规则类型排序...")
+    print(f"\n[5/5] Sorting by rule type...")
     sorted_rules = sort_rules(final)
 
     return sorted_rules, stats
 
 
 def get_rule_type(rule: str) -> str:
-    """识别规则类型（严格区分大小写）"""
+    """Identify the rule type (case-sensitive)."""
     stripped = rule.strip()
     if not stripped:
         return "UNKNOWN"
-    # 不含逗号，或以 "." 开头 → 纯域名
+    # No comma, or starts with "." -> plain domain
     if "," not in stripped or stripped.startswith("."):
         return "PLAIN_DOMAIN"
-    prefix = stripped.split(",")[0].strip()  # 不做大小写转换
+    prefix = stripped.split(",")[0].strip()  # no case conversion
     return prefix if prefix in RULE_ORDER else "UNKNOWN"
 
 
 def sort_rules(rules: list[str]) -> list[str]:
-    """按规则类型排序（no-resolve 已在 clean_rule 阶段处理，此处不再重复）"""
+    """Sort by rule type (no-resolve is already handled in clean_rule, not repeated here)."""
     priority = {rtype: i for i, rtype in enumerate(RULE_ORDER)}
 
     processed = []
@@ -354,7 +354,7 @@ def sort_rules(rules: list[str]) -> list[str]:
 
 
 def write_output(rules: list[str], output_dir: str, filename: str, urls: list[str], stats: dict) -> str:
-    """写出 .conf 文件, 自动补全 .conf 后缀"""
+    """Write the .conf file, appending the .conf extension automatically."""
     os.makedirs(output_dir, exist_ok=True)
 
     if not filename.endswith(".conf"):
@@ -384,75 +384,75 @@ def write_output(rules: list[str], output_dir: str, filename: str, urls: list[st
 
 def print_stats(stats: dict, output_path: str):
     print("\n" + "=" * 50)
-    print("  合并完成!")
+    print("  Merge complete!")
     print("=" * 50)
-    print(f"  规则源数量        : {stats['sources']}")
-    print(f"  读取失败源        : {stats['failed_sources']}")
-    print(f"  原始总行数        : {stats['total_lines']}")
-    print(f"  注释/空行/非法    : {stats['comment_or_empty']}")
-    print(f"  有效规则(去重前)  : {stats['before_dedup']}")
-    print(f"  有效规则(去重后)  : {stats['after_dedup']}")  # 现在语义准确
-    print(f"  排除规则          : {stats.get('excluded', 0)}")
+    print(f"  Rule sources          : {stats['sources']}")
+    print(f"  Failed sources        : {stats['failed_sources']}")
+    print(f"  Raw total lines       : {stats['total_lines']}")
+    print(f"  Comment/blank/invalid : {stats['comment_or_empty']}")
+    print(f"  Valid rules (pre-dedup) : {stats['before_dedup']}")
+    print(f"  Valid rules (post-dedup): {stats['after_dedup']}")
+    print(f"  Excluded rules        : {stats.get('excluded', 0)}")
     if stats.get("excluded_rules"):
         for r in stats["excluded_rules"]:
             print(f"    - {r}")
-    print(f"  有效规则(最终)    : {stats['final']}")
-    print(f"  重复去除          : {stats['before_dedup'] - stats['after_dedup']}")  # 不再混入 excluded
-    print(f"  输出文件          : {output_path}")
+    print(f"  Valid rules (final)   : {stats['final']}")
+    print(f"  Duplicates removed    : {stats['before_dedup'] - stats['after_dedup']}")
+    print(f"  Output file           : {output_path}")
     print("=" * 50)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Surge 规则集合并工具: 合并多个 .conf/.list 规则源, 去重后输出 .conf 文件",
+        description="Surge rule-set merger: merge multiple .conf/.list rule sources, deduplicate, output a .conf file",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-示例:
+Examples:
   python surge_merge.py \\
     -u https://example.com/rules1.list https://example.com/rules2.conf \\
     -o ./output \\
     -n my_rules
 
-  # 也可以从文件读取 URL 列表 (每行一个 URL):
+  # You can also read the URL list from a file (one URL per line):
   python surge_merge.py -f urls.txt -o ./output -n merged
         """,
     )
 
     source_group = parser.add_mutually_exclusive_group(required=True)
     source_group.add_argument(
-        "-u", "--urls", nargs="+", metavar="URL_OR_PATH", help="一个或多个规则集 URL 或本地文件路径 (空格分隔, 可混用)"
+        "-u", "--urls", nargs="+", metavar="URL_OR_PATH", help="one or more rule-set URLs or local file paths (space-separated, may be mixed)"
     )
     source_group.add_argument(
-        "-f", "--file", metavar="URL_FILE", help="包含 URL 列表的文本文件 (每行一个 URL, # 开头为注释)"
+        "-f", "--file", metavar="URL_FILE", help="text file with a URL list (one URL per line, lines starting with # are comments)"
     )
     source_group.add_argument(
-        "-b", "--batch", metavar="BATCH_FILE", help="批量配置文件, 用 [文件名] 分组, 每行一个 URL 或本地路径"
+        "-b", "--batch", metavar="BATCH_FILE", help="batch config file, grouped by [filename], one URL or local path per line"
     )
 
-    parser.add_argument("-o", "--output-dir", required=True, metavar="DIR", help="输出目录 (不存在会自动创建)")
+    parser.add_argument("-o", "--output-dir", required=True, metavar="DIR", help="output directory (created if it does not exist)")
     parser.add_argument(
-        "-n", "--name", required=False, default=None, metavar="FILENAME", help="输出文件名 (无需包含 .conf 后缀)"
+        "-n", "--name", required=False, default=None, metavar="FILENAME", help="output filename (no need to include the .conf extension)"
     )
 
     args = parser.parse_args()
 
-    # 收集任务列表: [(output_name, [urls])]
+    # Collect the task list: [(output_name, [urls])]
     if args.urls:
         if not args.name:
-            print("[错误] 单组模式下 -n/--name 为必填项", file=sys.stderr)
+            print("[error] -n/--name is required in single-group mode", file=sys.stderr)
             sys.exit(1)
         tasks = [(args.name, args.urls)]
     elif args.file:
         if not os.path.isfile(args.file):
-            print(f"[错误] 找不到 URL 文件: {args.file}", file=sys.stderr)
+            print(f"[error] URL file not found: {args.file}", file=sys.stderr)
             sys.exit(1)
         with open(args.file, "r", encoding="utf-8") as f:
             urls = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
         if not urls:
-            print("[错误] URL 文件为空或全为注释", file=sys.stderr)
+            print("[error] URL file is empty or all comments", file=sys.stderr)
             sys.exit(1)
         if not args.name:
-            print("[错误] 单组模式下 -n/--name 为必填项", file=sys.stderr)
+            print("[error] -n/--name is required in single-group mode", file=sys.stderr)
             sys.exit(1)
         tasks = [(args.name, urls)]
     else:  # batch
@@ -468,17 +468,17 @@ def main():
             group_excludes = []
 
         print(f"\n{'=' * 50}")
-        print(f"  任务 [{idx}/{total}]: {name}")
+        print(f"  Task [{idx}/{total}]: {name}")
         print(f"{'=' * 50}")
 
         rules, stats = merge_rules(urls, group_excludes)
 
         if rules is None:
-            print(f"[错误] 任务 {name} 因源读取失败而终止，跳过输出", file=sys.stderr)
+            print(f"[error] task {name} aborted due to a source load failure, skipping output", file=sys.stderr)
             continue
 
         if not rules:
-            print(f"\n[警告] 任务 {name} 合并结果为空, 跳过", file=sys.stderr)
+            print(f"\n[warning] task {name} produced an empty result, skipping", file=sys.stderr)
             continue
 
         output_path = write_output(rules, args.output_dir, name, urls, stats)
@@ -486,7 +486,7 @@ def main():
         success_count += 1
 
     if total > 1:
-        print(f"\n所有任务完成, 共生成 {success_count}/{total} 个文件, 输出目录: {args.output_dir}")
+        print(f"\nAll tasks complete, generated {success_count}/{total} file(s), output directory: {args.output_dir}")
 
 
 if __name__ == "__main__":
