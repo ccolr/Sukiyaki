@@ -274,6 +274,8 @@ https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
 EXCLUDE: google
+EXCLUDE: qbittorrent
+EXCLUDE: transmission
 EXCLUDE: juejin\.cn$
 EXCLUDE: awstrack\.me$
 
@@ -291,6 +293,8 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdGuardSDNSFilter/AdGuardSDNSFilter_All_No_Resolve.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdvertisingTest/AdvertisingTest_All_No_Resolve.list
 EXCLUDE: google
+EXCLUDE: qbittorrent
+EXCLUDE: transmission
 EXCLUDE: juejin\.cn$
 EXCLUDE: awstrack\.me$
 
