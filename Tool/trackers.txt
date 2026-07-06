@@ -1,0 +1,7 @@
+[all]
+https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt
+https://cf.trackerslist.com/all.txt
+
+[best]
+https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt
+https://cf.trackerslist.com/best.txt

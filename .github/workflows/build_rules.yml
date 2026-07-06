@@ -13,6 +13,8 @@ on:
       - "Tool/surge_merge.py"
       - "Tool/surge_modules.txt"
       - "Tool/fetch_modules.py"
+      - "Tool/trackers.txt"
+      - "Tool/trackers_merge.py"
   workflow_dispatch:
 
 jobs:
@@ -39,14 +41,21 @@ jobs:
             -b Tool/batch.txt \
             -o ./Rule
 
-      - name: Commit Rule/ changes in this repo
+      - name: Aggregate trackers into this repo's Trackers/
+        working-directory: Sukiyaki
+        run: |
+          python3 Tool/trackers_merge.py \
+            -b Tool/trackers.txt \
+            -o ./Trackers
+
+      - name: Commit Rule/ and Trackers/ changes in this repo
         working-directory: Sukiyaki
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Rule/
+          git add Rule/ Trackers/
           if git diff --cached --quiet; then
-            echo "Rule/ unchanged, skipping commit"
+            echo "Rule/ and Trackers/ unchanged, skipping commit"
           else
             git commit -m "Auto-merge: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
             git push
@@ -71,12 +80,17 @@ jobs:
           mkdir -p Rule/Surge_Modules
           rsync -a Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
 
+      - name: Sync Trackers/ to the Rule repo
+        run: |
+          mkdir -p Rule/Trackers
+          rsync -a Sukiyaki/Trackers/ Rule/Trackers/
+
       - name: Push to the Rule repo
         run: |
           cd Rule
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Surge/ Surge_Modules/
+          git add Surge/ Surge_Modules/ Trackers/
           git diff --cached --quiet && echo "No changes, skipping push" && exit 0
           git commit -m "Auto-build: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
           git push
