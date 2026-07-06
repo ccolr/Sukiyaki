@@ -63,6 +63,9 @@ EXCLUDE: fbcdn
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/BBC.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BBC/BBC.list
 
+[Bittorrent]
+./MyRule/Bittorrent.conf
+
 [bilibili]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BiliBili/BiliBili.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bilibili.list

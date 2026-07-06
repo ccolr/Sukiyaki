@@ -30,6 +30,10 @@
 ./Rule/BBC.conf
 ./MyRule/BBC.conf
 
+[Bittorrent]
+./Rule/Bittorrent.conf
+./MyRule/Bittorrent.conf
+
 [bilibili]
 ./Rule/bilibili.conf
 ./MyRule/bilibili.conf
