@@ -30,6 +30,10 @@
 ./Rule/BBC.conf
 ./MyRule/BBC.conf
 
+[BT_Web]
+./Rule/BT_Web.conf
+./MyRule/BT_Web.conf
+
 [Bittorrent]
 ./Rule/Bittorrent.conf
 ./MyRule/Bittorrent.conf
