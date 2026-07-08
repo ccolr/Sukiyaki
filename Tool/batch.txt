@@ -63,8 +63,8 @@ EXCLUDE: fbcdn
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/BBC.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BBC/BBC.list
 
-[BT_Web]
-./MyRule/BT_Web.conf
+[BT]
+./MyRule/BT.conf
 
 [Bittorrent]
 ./MyRule/Bittorrent.conf
