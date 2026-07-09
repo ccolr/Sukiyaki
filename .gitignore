@@ -3,3 +3,5 @@
 .python-version
 CLAUDE.md
 /Tool/__pycache__
+main.py
+pyproject.toml
