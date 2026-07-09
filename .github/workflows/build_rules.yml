@@ -41,6 +41,13 @@ jobs:
             -b Tool/batch.txt \
             -o ./Rule
 
+      - name: Fetch Surge modules into Surge_Modules/
+        working-directory: Sukiyaki
+        run: |
+          python3 Tool/fetch_modules.py \
+            -i Tool/surge_modules.txt \
+            -o ./Surge_Modules
+
       - name: Aggregate trackers into this repo's Trackers/
         working-directory: Sukiyaki
         run: |
@@ -48,14 +55,14 @@ jobs:
             -b Tool/trackers.txt \
             -o ./Trackers
 
-      - name: Commit Rule/ and Trackers/ changes in this repo
+      - name: Commit Rule/ Surge_Modules/ Trackers/ changes in this repo
         working-directory: Sukiyaki
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Rule/ Trackers/
+          git add Rule/ Surge_Modules/ Trackers/
           if git diff --cached --quiet; then
-            echo "Rule/ and Trackers/ unchanged, skipping commit"
+            echo "Rule/ Surge_Modules/ Trackers/ unchanged, skipping commit"
           else
             git commit -m "Auto-merge: $(date -u '+%Y-%m-%d %H:%M UTC') [${{ github.event_name }}]"
             git push
@@ -67,13 +74,6 @@ jobs:
           python3 Tool/surge_classify.py \
             -b Tool/classify_batch.txt \
             -o ../Rule
-
-      - name: Fetch Surge modules into Surge_Modules/
-        working-directory: Sukiyaki
-        run: |
-          python3 Tool/fetch_modules.py \
-            -i Tool/surge_modules.txt \
-            -o ./Surge_Modules
 
       - name: Sync Surge_Modules/ to the Rule repo
         run: |
