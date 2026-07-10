@@ -36,7 +36,7 @@ https://raw.githubusercontent.com/Rabbit-Spec/Surge/Master/Module/Panel/Interfac
 REPLACE: https://raw.githubusercontent.com/xream/scripts/main/surge/modules/interface-info/interface-info.js https://sukiyaki.cco.moe/Surge_Modules/interface-info.js
 https://raw.githubusercontent.com/Rabbit-Spec/Surge/Master/Module/Panel/Timecard/Moore/Timecard.sgmodule
 REPLACE: https://raw.githubusercontent.com/smartmimi/conf/master/surge/timecard.js https://sukiyaki.cco.moe/Surge_Modules/timecard.js
-https://raw.githubusercontent.com/xream/scripts/main/surge/modules/kill-active-requests/index.sgmodule
+https://raw.githubusercontent.com/xream/scripts/main/surge/modules/kill-active-requests/index.sgmodule kill-active-requests
 REPLACE: https://raw.githubusercontent.com/xream/scripts/main/surge/modules/kill-active-requests/index.js https://sukiyaki.cco.moe/Surge_Modules/kill-active-requests.js
 https://raw.githubusercontent.com/mieqq/mieqq/master/ruleMatchingTime.sgmodule
 REPLACE: https://raw.githubusercontent.com/mieqq/mieqq/master/ruleMatchingTime.js https://sukiyaki.cco.moe/Surge_Modules/ruleMatchingTime.js
