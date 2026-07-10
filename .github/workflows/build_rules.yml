@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - "MyRule/**.conf"
+      - "Surge_Modules/**"
       - "Tool/classify_batch.txt"
       - "Tool/batch.txt"
       - "Tool/surge_classify.py"
