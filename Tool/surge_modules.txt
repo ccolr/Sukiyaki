@@ -13,7 +13,6 @@ https://raw.githubusercontent.com/xream/scripts/main/surge/modules/network-info/
 https://raw.githubusercontent.com/xream/scripts/main/surge/modules/interface-info/interface-info.js
 https://raw.githubusercontent.com/smartmimi/conf/master/surge/timecard.js
 https://raw.githubusercontent.com/xream/scripts/main/surge/modules/kill-active-requests/index.js kill-active-requests
-https://raw.githubusercontent.com/mieqq/mieqq/master/ruleMatchingTime.js
 
 [Modified]
 https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/modules/Panel/CFGPT/CFGPT.sgmodule
@@ -38,5 +37,3 @@ https://raw.githubusercontent.com/Rabbit-Spec/Surge/Master/Module/Panel/Timecard
 REPLACE: https://raw.githubusercontent.com/smartmimi/conf/master/surge/timecard.js https://sukiyaki.cco.moe/Surge_Modules/timecard.js
 https://raw.githubusercontent.com/xream/scripts/main/surge/modules/kill-active-requests/index.sgmodule kill-active-requests
 REPLACE: https://raw.githubusercontent.com/xream/scripts/main/surge/modules/kill-active-requests/index.js https://sukiyaki.cco.moe/Surge_Modules/kill-active-requests.js
-https://raw.githubusercontent.com/mieqq/mieqq/master/ruleMatchingTime.sgmodule
-REPLACE: https://raw.githubusercontent.com/mieqq/mieqq/master/ruleMatchingTime.js https://sukiyaki.cco.moe/Surge_Modules/ruleMatchingTime.js
