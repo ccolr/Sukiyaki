@@ -1241,6 +1241,7 @@ http://www.xwt-classics.net:80/announce
 http://www.zone-torrent.net:80/announce
 http://xtremewrestlingtorrents.net:80/announce
 http://yggtracker.i2p.rocks:80/announce
+http://132.243.161.144:6969/announce
 https://tracker.zhuqiy.com:443/announce
 https://tracker.yemekyedim.com:443/announce
 https://tracker.pmman.tech:443/announce
