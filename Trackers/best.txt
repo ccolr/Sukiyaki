@@ -22,7 +22,6 @@ udp://tracker.sylphix.com:6969/announce
 udp://anime-tracker.aruku.kro.kr:8081/announce
 udp://bittorrent-tracker.e-n-c-r-y-p-t.net:1337/announce
 udp://evan.im:6969/announce
-udp://exodus.desync.com:6969/announce
 udp://mail.segso.net:6969/announce
 udp://martin-gebhardt.eu:25/announce
 udp://open.ftorrent.com:443/announce
@@ -35,15 +34,13 @@ udp://tracker.aruku.ovh:8081/announce
 udp://tracker.bluefrog.pw:2710/announce
 udp://tracker.corpscorp.online:80/announce
 udp://tracker.dler.com:6969/announce
-udp://tracker.dler.org:6969/announce
-udp://tracker.ducks.party:1984/announce
 udp://tracker.gmi.gd:6969/announce
 udp://tracker.ilibr.org:6969/announce
+udp://tracker.nyaa.vc:6969/announce
 udp://tracker.opentrackr.com:6969/announce
 udp://tracker.peerfect.org:6969/announce
 udp://tracker.skyts.net:6969/announce
 udp://tracker.teambelgium.net:6969/announce
-udp://zer0day.ch:1337/announce
 http://tracker.gbitt.info/announce
 http://www.wareztorrent.com/announce
 http://tk.greedland.net/announce
@@ -61,7 +58,6 @@ http://nyaa.tracker.wf:7777/announce
 http://tracker.bt4g.com:2095/announce
 http://tracker.dhitechnical.com:6969/announce
 http://tracker.mywaifu.best:6969/announce
-http://tracker.opentrackr.org:1337/announce
 http://tracker.renfei.net:8080/announce
 http://tracker.waaa.moe:6969/announce
 http://tracker.xn--djrq4gl4hvoi.top:80/announce
@@ -81,6 +77,7 @@ https://tr.abiir.top/announce
 https://tracker.kuroy.me:443/announce
 https://1337.abcvg.info:443/announce
 https://tracker.gbitt.info/announce
+https://004430.xyz:443/announce
 https://021912.xyz:443/announce
 https://banananetwork.qzz.io:443/announce
 https://ht.therarbg.to:443/announce
