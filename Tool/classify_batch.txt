@@ -10,6 +10,10 @@
 ./Rule/Adobe.conf
 ./MyRule/Adobe.conf
 
+[Akamai]
+./Rule/Akamai.conf
+./MyRule/Akamai.conf
+
 [AI]
 ./Rule/AI.conf
 ./MyRule/AI.conf
