@@ -106,10 +106,6 @@
 ./Rule/Hulu.conf
 ./MyRule/Hulu.conf
 
-[Instagram]
-./Rule/Instagram.conf
-./MyRule/Instagram.conf
-
 [IP_Check]
 ./Rule/IP_Check.conf
 ./MyRule/IP_Check.conf
@@ -277,10 +273,6 @@
 [VOA]
 ./Rule/VOA.conf
 ./MyRule/VOA.conf
-
-[WhatsApp]
-./Rule/WhatsApp.conf
-./MyRule/WhatsApp.conf
 
 [YouTube]
 ./Rule/YouTube.conf

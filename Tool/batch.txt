@@ -144,6 +144,10 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Facebook.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/MetaPlatforms.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Facebook/Facebook.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Instagram.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Instagram/Instagram.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Whatsapp.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
 
 [GB]
 ./MyRule/GB.conf
@@ -173,10 +177,6 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Hulu/Hulu.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/HuluJP/HuluJP.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/HuluUSA/HuluUSA.list
-
-[Instagram]
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Instagram.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Instagram/Instagram.list
 
 [IP_Check]
 ./MyRule/IP_Check.conf
@@ -388,10 +388,6 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 
 [VOA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/VOA/VOA.list
-
-[WhatsApp]
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Whatsapp.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
 
 [YouTube]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
