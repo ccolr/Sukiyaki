@@ -250,10 +250,6 @@
 ./Rule/Twitch.conf
 ./MyRule/Twitch.conf
 
-[Twitter]
-./Rule/Twitter.conf
-./MyRule/Twitter.conf
-
 [U-NEXT]
 ./Rule/U-NEXT.conf
 ./MyRule/U-NEXT.conf
@@ -273,6 +269,10 @@
 [VOA]
 ./Rule/VOA.conf
 ./MyRule/VOA.conf
+
+[X]
+./Rule/Twitter.conf
+./MyRule/Twitter.conf
 
 [YouTube]
 ./Rule/YouTube.conf

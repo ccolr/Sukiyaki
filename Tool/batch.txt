@@ -27,10 +27,12 @@ EXCLUDE: google
 EXCLUDE: gemini
 EXCLUDE: deepmind
 EXCLUDE: antigravity
+EXCLUDE: grok
+EXCLUDE: x\.ai$
 EXCLUDE: g\.ai$
+EXCLUDE: go\.dev$
 EXCLUDE: \.gle$
 EXCLUDE: \.goog$
-EXCLUDE: go\.dev$
 EXCLUDE: googleapis\.com$
 
 [Amazon]
@@ -370,10 +372,6 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Twitch/Twitch.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitch.list
 
-[Twitter]
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Twitter/Twitter.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitter.list
-
 [U-NEXT]
 ./MyRule/U-NEXT.conf
 
@@ -388,6 +386,10 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 
 [VOA]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/VOA/VOA.list
+
+[X]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Twitter/Twitter.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitter.list
 
 [YouTube]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
