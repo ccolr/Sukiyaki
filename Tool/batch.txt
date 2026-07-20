@@ -31,11 +31,12 @@ EXCLUDE: grok
 EXCLUDE: ^x\.ai$
 EXCLUDE: ^g\.ai$
 EXCLUDE: ^go\.dev$
+EXCLUDE: ^googleapis\.com$
+EXCLUDE: \.gle$
+EXCLUDE: \.goog$
 EXCLUDE: \.x\.ai$
 EXCLUDE: \.g\.ai$
 EXCLUDE: \.go\.dev$
-EXCLUDE: \.gle$
-EXCLUDE: \.goog$
 EXCLUDE: \.googleapis\.com$
 
 [Amazon]

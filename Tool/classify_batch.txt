@@ -271,8 +271,8 @@
 ./MyRule/VOA.conf
 
 [X]
-./Rule/Twitter.conf
-./MyRule/Twitter.conf
+./Rule/X.conf
+./MyRule/X.conf
 
 [YouTube]
 ./Rule/YouTube.conf
