@@ -28,12 +28,15 @@ EXCLUDE: gemini
 EXCLUDE: deepmind
 EXCLUDE: antigravity
 EXCLUDE: grok
-EXCLUDE: x\.ai$
-EXCLUDE: g\.ai$
-EXCLUDE: go\.dev$
+EXCLUDE: ^x\.ai$
+EXCLUDE: ^g\.ai$
+EXCLUDE: ^go\.dev$
+EXCLUDE: \.x\.ai$
+EXCLUDE: \.g\.ai$
+EXCLUDE: \.go\.dev$
 EXCLUDE: \.gle$
 EXCLUDE: \.goog$
-EXCLUDE: googleapis\.com$
+EXCLUDE: \.googleapis\.com$
 
 [Amazon]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Amazon/Amazon.list
@@ -263,10 +266,6 @@ EXCLUDE: apple
 EXCLUDE: google
 EXCLUDE: youtube
 EXCLUDE: waze
-EXCLUDE: \.goog$
-EXCLUDE: \.gle$
-EXCLUDE: go\.dev$
-EXCLUDE: googleapis\.com$
 EXCLUDE: openai
 EXCLUDE: chatgpt
 EXCLUDE: anthropic
@@ -274,8 +273,15 @@ EXCLUDE: claude
 EXCLUDE: gemini
 EXCLUDE: oracle
 EXCLUDE: telegram
+EXCLUDE: ^go\.dev$
+EXCLUDE: ^googleapis\.com$
+EXCLUDE: ^githubcopilot\.com$
 EXCLUDE: \.ai$
-EXCLUDE: githubcopilot\.com$
+EXCLUDE: \.goog$
+EXCLUDE: \.gle$
+EXCLUDE: \.go\.dev$
+EXCLUDE: \.googleapis\.com$
+EXCLUDE: \.githubcopilot\.com$
 
 [Rakuten]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Rakuten/Rakuten.list
@@ -294,9 +300,11 @@ EXCLUDE: google
 EXCLUDE: bittorrent
 EXCLUDE: qbittorrent
 EXCLUDE: transmission
-EXCLUDE: juejin\.cn$
-EXCLUDE: awstrack\.me$
-EXCLUDE: hm\.baidu\.com$
+EXCLUDE: ^juejin\.cn$
+EXCLUDE: \.juejin\.cn$
+EXCLUDE: ^awstrack\.me$
+EXCLUDE: \.awstrack\.me$
+EXCLUDE: ^hm\.baidu\.com$
 
 [Reject_Drop]
 https://ruleset.skk.moe/List/non_ip/reject-drop.conf
@@ -315,8 +323,10 @@ EXCLUDE: google
 EXCLUDE: bittorrent
 EXCLUDE: qbittorrent
 EXCLUDE: transmission
-EXCLUDE: juejin\.cn$
-EXCLUDE: awstrack\.me$
+EXCLUDE: ^juejin\.cn$
+EXCLUDE: \.juejin\.cn$
+EXCLUDE: ^awstrack\.me$
+EXCLUDE: \.awstrack\.me$
 
 [Snapchat]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Snap/Snap.list
