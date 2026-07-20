@@ -23,6 +23,15 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Cursor.li
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Ai_other.list
 https://ruleset.skk.moe/List/non_ip/ai.conf
 EXCLUDE: notion
+EXCLUDE: google
+EXCLUDE: gemini
+EXCLUDE: deepmind
+EXCLUDE: antigravity
+EXCLUDE: g\.ai$
+EXCLUDE: \.gle$
+EXCLUDE: \.goog$
+EXCLUDE: go\.dev$
+EXCLUDE: googleapis\.com$
 
 [Amazon]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Amazon/Amazon.list
