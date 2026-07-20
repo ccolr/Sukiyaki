@@ -281,6 +281,14 @@ def fetch_content(url: str, retries: int = MAX_RETRIES, delay: int = RETRY_DELAY
 # ============================================================
 
 
+def matches_exclude_rule(rule: str, patterns: list[re.Pattern]) -> bool:
+    """Match exclusions against either the complete rule or its primary value."""
+    targets = [rule]
+    if "," in rule:
+        targets.append(rule.split(",", 2)[1].strip())
+    return any(pattern.search(target) for pattern in patterns for target in targets)
+
+
 def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = None) -> tuple[list[str] | None, dict]:
     stats = {
         "sources": len(urls),
@@ -299,12 +307,17 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
     for url in urls:
         lines = fetch_content(url)
         if lines is None:
-            print(f"\n[error] source {url} failed to load; aborting this task to avoid an incomplete rule set", file=sys.stderr)
+            print(
+                f"\n[error] source {url} failed to load; aborting this task to avoid an incomplete rule set",
+                file=sys.stderr,
+            )
             return None, stats
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/4] Cleaning (strip whitespace -> filter invalid lines -> strip inline comments -> validate logical rules -> append no-resolve)...")
+    print(
+        f"\n[2/4] Cleaning (strip whitespace -> filter invalid lines -> strip inline comments -> validate logical rules -> append no-resolve)..."
+    )
     cleaned = []
     for line in all_lines:
         result = clean_rule(line)
@@ -334,7 +347,7 @@ def merge_and_clean(urls: list[str], group_excludes: list[re.Pattern] | None = N
     print(f"\n[4/4] Applying exclude rules...")
     final: list[str] = []
     for rule in deduped:
-        if any(p.search(rule) for p in all_patterns):
+        if matches_exclude_rule(rule, all_patterns):
             stats["excluded"] += 1
             stats["excluded_rules"].append(rule)
             continue
@@ -541,7 +554,8 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
             elif line.startswith("EXCLUDE:"):
                 if phase == "sources" and not current_sources:
                     print(
-                        f"[error] line {lineno}: exclude rule appears before any source (group: {current_name})", file=sys.stderr
+                        f"[error] line {lineno}: exclude rule appears before any source (group: {current_name})",
+                        file=sys.stderr,
                     )
                     sys.exit(1)
                 phase = "excludes"
@@ -563,7 +577,10 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
                     print(f"[error] line {lineno}: rule line appears before any [group]", file=sys.stderr)
                     sys.exit(1)
                 if phase == "excludes":
-                    print(f"[error] line {lineno}: source appears after exclude rules (group: {current_name})", file=sys.stderr)
+                    print(
+                        f"[error] line {lineno}: source appears after exclude rules (group: {current_name})",
+                        file=sys.stderr,
+                    )
                     sys.exit(1)
                 current_sources.append(line)
 
@@ -586,7 +603,9 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Surge rule classifier: merge rule sources, split into domains/non_ip/ip outputs")
+    parser = argparse.ArgumentParser(
+        description="Surge rule classifier: merge rule sources, split into domains/non_ip/ip outputs"
+    )
     parser.add_argument(
         "-b",
         "--batch",

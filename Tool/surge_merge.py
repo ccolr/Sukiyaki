@@ -103,7 +103,8 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
             elif line.startswith("EXCLUDE:"):
                 if phase == "sources" and not current_sources:
                     print(
-                        f"[error] line {lineno}: exclude rule appears before any source (group: {current_name})", file=sys.stderr
+                        f"[error] line {lineno}: exclude rule appears before any source (group: {current_name})",
+                        file=sys.stderr,
                     )
                     sys.exit(1)
                 phase = "excludes"
@@ -125,7 +126,10 @@ def parse_batch_file(batch_path: str) -> list[tuple[str, list[str], list[re.Patt
                     print(f"[error] line {lineno}: rule line appears before any [group]", file=sys.stderr)
                     sys.exit(1)
                 if phase == "excludes":
-                    print(f"[error] line {lineno}: source appears after exclude rules (group: {current_name})", file=sys.stderr)
+                    print(
+                        f"[error] line {lineno}: source appears after exclude rules (group: {current_name})",
+                        file=sys.stderr,
+                    )
                     sys.exit(1)
                 current_sources.append(line)
 
@@ -261,6 +265,14 @@ def clean_rule(line: str) -> str | None:
     return line
 
 
+def matches_exclude_rule(rule: str, patterns: list[re.Pattern]) -> bool:
+    """Match exclusions against either the complete rule or its primary value."""
+    targets = [rule]
+    if "," in rule:
+        targets.append(rule.split(",", 2)[1].strip())
+    return any(pattern.search(target) for pattern in patterns for target in targets)
+
+
 def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None) -> tuple[list[str] | None, dict]:
     all_lines: list[str] = []
     stats = {
@@ -288,12 +300,17 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
     for url in urls:
         lines = fetch_content(url)
         if lines is None:
-            print(f"\n[error] source {url} failed to load; aborting this task to avoid an incomplete rule set", file=sys.stderr)
+            print(
+                f"\n[error] source {url} failed to load; aborting this task to avoid an incomplete rule set",
+                file=sys.stderr,
+            )
             return None, stats
         stats["total_lines"] += len(lines)
         all_lines.extend(lines)
 
-    print(f"\n[2/5] Cleaning (strip whitespace -> filter invalid lines -> strip inline comments -> append no-resolve)...")
+    print(
+        f"\n[2/5] Cleaning (strip whitespace -> filter invalid lines -> strip inline comments -> append no-resolve)..."
+    )
     cleaned: list[str] = []
     for line in all_lines:
         result = clean_rule(line)
@@ -315,7 +332,7 @@ def merge_rules(urls: list[str], group_excludes: list[re.Pattern] | None = None)
     print(f"\n[4/5] Applying exclude rules...")
     final: list[str] = []
     for rule in deduped:
-        if any(p.search(rule) for p in all_patterns):
+        if matches_exclude_rule(rule, all_patterns):
             stats["excluded"] += 1
             stats["excluded_rules"].append(rule)
             continue
@@ -420,18 +437,35 @@ Examples:
 
     source_group = parser.add_mutually_exclusive_group(required=True)
     source_group.add_argument(
-        "-u", "--urls", nargs="+", metavar="URL_OR_PATH", help="one or more rule-set URLs or local file paths (space-separated, may be mixed)"
+        "-u",
+        "--urls",
+        nargs="+",
+        metavar="URL_OR_PATH",
+        help="one or more rule-set URLs or local file paths (space-separated, may be mixed)",
     )
     source_group.add_argument(
-        "-f", "--file", metavar="URL_FILE", help="text file with a URL list (one URL per line, lines starting with # are comments)"
+        "-f",
+        "--file",
+        metavar="URL_FILE",
+        help="text file with a URL list (one URL per line, lines starting with # are comments)",
     )
     source_group.add_argument(
-        "-b", "--batch", metavar="BATCH_FILE", help="batch config file, grouped by [filename], one URL or local path per line"
+        "-b",
+        "--batch",
+        metavar="BATCH_FILE",
+        help="batch config file, grouped by [filename], one URL or local path per line",
     )
 
-    parser.add_argument("-o", "--output-dir", required=True, metavar="DIR", help="output directory (created if it does not exist)")
     parser.add_argument(
-        "-n", "--name", required=False, default=None, metavar="FILENAME", help="output filename (no need to include the .conf extension)"
+        "-o", "--output-dir", required=True, metavar="DIR", help="output directory (created if it does not exist)"
+    )
+    parser.add_argument(
+        "-n",
+        "--name",
+        required=False,
+        default=None,
+        metavar="FILENAME",
+        help="output filename (no need to include the .conf extension)",
     )
 
     args = parser.parse_args()
