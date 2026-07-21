@@ -309,7 +309,9 @@ EXCLUDE: \.juejin\.cn$
 EXCLUDE: ^awstrack\.me$
 EXCLUDE: \.awstrack\.me$
 EXCLUDE: ^hm\.baidu\.com$
-EXCLUDE: \.maccms\.la$
+EXCLUDE: maccms\.la$
+EXCLUDE: anidb\.net$
+EXCLUDE: dplayerstatic\.com$
 
 [Reject_Drop]
 https://ruleset.skk.moe/List/non_ip/reject-drop.conf
@@ -332,7 +334,9 @@ EXCLUDE: ^juejin\.cn$
 EXCLUDE: \.juejin\.cn$
 EXCLUDE: ^awstrack\.me$
 EXCLUDE: \.awstrack\.me$
-EXCLUDE: \.maccms\.la$
+EXCLUDE: maccms\.la$
+EXCLUDE: anidb\.net$
+EXCLUDE: dplayerstatic\.com$
 
 [Snapchat]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Snap/Snap.list
