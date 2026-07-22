@@ -46,6 +46,10 @@
 ./Rule/bilibili.conf
 ./MyRule/bilibili.conf
 
+[Bluesky]
+./Rule/Bluesky.conf
+./MyRule/Bluesky.conf
+
 [Cloudflare]
 ./Rule/Cloudflare.conf
 ./MyRule/Cloudflare.conf
