@@ -406,6 +406,10 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitch.li
 [US]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Wikipedia/Wikipedia.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Wordpress/Wordpress.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/CNN/CNN.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Fox/Fox.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/FOXNOW/FOXNOW.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/FOXPlus/FOXPlus.list
 
 [Vercel]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Vercel/Vercel.list
