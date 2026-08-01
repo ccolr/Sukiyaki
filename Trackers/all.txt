@@ -401,6 +401,7 @@ udp://yuptracker-sa.gaijinent.com:27022/announce
 udp://yuptracker-us.gaijinent.com:27022/announce
 udp://yuptracker.gaijinent.com:27022/announce
 udp://zer0day.ch:1337/announce
+udp://tracker.cn.nyaa.net:6969/announce
 http://tracker.opentrackr.org:1337/announce
 http://www.torrentsnipe.info:2701/announce
 http://www.genesis-sp.org:2710/announce
