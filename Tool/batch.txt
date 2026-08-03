@@ -164,16 +164,17 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [GB]
 ./MyRule/GB.conf
 
-[Gemini]
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Gemini/Gemini.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Gemini.list
-
 [Google]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Google.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Google/Google.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GoogleFCM/GoogleFCM.list
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/google.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Gemini/Gemini.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Gemini.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTubeMusic/YouTubeMusic.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Youtube.list
 
 [HBO]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/HBO.list
@@ -423,8 +424,3 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [X]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Twitter/Twitter.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Twitter.list
-
-[YouTube]
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTubeMusic/YouTubeMusic.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Youtube.list
