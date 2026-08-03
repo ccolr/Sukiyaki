@@ -25,7 +25,6 @@ udp://mail.segso.net:6969/announce
 udp://martin-gebhardt.eu:25/announce
 udp://ns575949.ip-51-222-82.net:6969/announce
 udp://open.ftorrent.com:443/announce
-udp://open.tracker.cl:1337/announce
 udp://open.tracker.ink:6969/announce
 udp://opentor.org:2710/announce
 udp://p4p.arenabg.com:1337/announce
@@ -33,7 +32,6 @@ udp://retracker.hotplug.ru:2710/announce
 udp://t.overflow.biz:6969/announce
 udp://tracker.aruku.ovh:8081/announce
 udp://tracker.dler.com:6969/announce
-udp://tracker.dler.org:6969/announce
 udp://tracker.gmi.gd:6969/announce
 udp://tracker.nexusstream.eu:6969/announce
 udp://tracker.nyaa.vc:6969/announce
@@ -41,7 +39,6 @@ udp://tracker.opentrackr.org:1337/announce
 udp://tracker.skyts.net:6969/announce
 udp://tracker.teambelgium.net:6969/announce
 udp://tracker.torrent.eu.org:451/announce
-udp://zer0day.ch:1337/announce
 http://tracker.opentrackr.org:1337/announce
 http://tracker.gbitt.info/announce
 http://www.wareztorrent.com/announce
@@ -60,8 +57,6 @@ http://nyaa.tracker.wf:7777/announce
 http://tracker.dhitechnical.com:6969/announce
 http://tracker.renfei.net:8080/announce
 http://tracker.waaa.moe:6969/announce
-http://tracker.xn--djrq4gl4hvoi.top:80/announce
-http://tracker.zhuqiy.dgj055.icu:80/announce
 http://www.wareztorrent.com:80/announce
 https://tracker.lilithraws.cf/announce
 https://tracker1.520.jp/announce
