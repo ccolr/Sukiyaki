@@ -86,10 +86,6 @@
 ./Rule/Epic.conf
 ./MyRule/Epic.conf
 
-[Facebook]
-./Rule/Facebook.conf
-./MyRule/Facebook.conf
-
 [GB]
 ./Rule/GB.conf
 ./MyRule/GB.conf
@@ -133,6 +129,10 @@
 [LinkedIn]
 ./Rule/LinkedIn.conf
 ./MyRule/LinkedIn.conf
+
+[Meta]
+./Rule/Meta.conf
+./MyRule/Meta.conf
 
 [Microsoft]
 ./Rule/Microsoft.conf

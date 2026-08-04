@@ -152,15 +152,6 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [Epic]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Epic/Epic.list
 
-[Facebook]
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Facebook.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/MetaPlatforms.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Facebook/Facebook.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Instagram.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Instagram/Instagram.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Whatsapp.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
-
 [GB]
 ./MyRule/GB.conf
 
@@ -215,6 +206,15 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [LinkedIn]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/LinkedIn/LinkedIn.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Linkedin.list
+
+[Meta]
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Facebook.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/MetaPlatforms.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Facebook/Facebook.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Instagram.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Instagram/Instagram.list
+https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Whatsapp.list
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
 
 [Microsoft]
 https://ruleset.skk.moe/List/non_ip/microsoft.conf
