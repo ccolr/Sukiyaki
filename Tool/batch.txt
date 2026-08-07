@@ -309,20 +309,6 @@ https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
-EXCLUDE: google
-EXCLUDE: bittorrent
-EXCLUDE: qbittorrent
-EXCLUDE: transmission
-EXCLUDE: ^juejin\.cn$
-EXCLUDE: \.juejin\.cn$
-EXCLUDE: ^awstrack\.me$
-EXCLUDE: \.awstrack\.me$
-EXCLUDE: ^hm\.baidu\.com$
-EXCLUDE: maccms\.la$
-EXCLUDE: anidb\.net$
-EXCLUDE: dplayerstatic\.com$
-
-[Reject_Drop]
 https://ruleset.skk.moe/List/non_ip/reject-drop.conf
 https://ruleset.skk.moe/List/non_ip/reject-no-drop.conf
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/reject.txt
@@ -343,6 +329,7 @@ EXCLUDE: ^juejin\.cn$
 EXCLUDE: \.juejin\.cn$
 EXCLUDE: ^awstrack\.me$
 EXCLUDE: \.awstrack\.me$
+EXCLUDE: ^hm\.baidu\.com$
 EXCLUDE: maccms\.la$
 EXCLUDE: anidb\.net$
 EXCLUDE: dplayerstatic\.com$

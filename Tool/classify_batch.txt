@@ -202,10 +202,6 @@
 ./Rule/Reject.conf
 ./MyRule/Reject.conf
 
-[Reject_Drop]
-./Rule/Reject_Drop.conf
-./MyRule/Reject_Drop.conf
-
 [Snapchat]
 ./Rule/Snapchat.conf
 ./MyRule/Snapchat.conf
