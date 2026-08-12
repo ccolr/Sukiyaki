@@ -107,8 +107,8 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Dazn.list
 https://ruleset.skk.moe/List/non_ip/domestic.conf
 https://ruleset.skk.moe/List/non_ip/direct.conf
 https://ruleset.skk.moe/List/ip/domestic.conf
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Direct.list
 https://ruleset.skk.moe/List/ip/china_ip.conf
+https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
 https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Direct/Direct.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/China/China_All_No_Resolve.list
@@ -122,7 +122,6 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaTelecom/ChinaTelecom.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaUnicom/ChinaUnicom.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/12306/12306.list
-https://ruleset.skk.moe/List/ip/china_ip_ipv6.conf
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/cncidr.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/cncidr.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/direct.txt
@@ -313,9 +312,6 @@ https://ruleset.skk.moe/List/non_ip/reject-drop.conf
 https://ruleset.skk.moe/List/non_ip/reject-no-drop.conf
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/reject.txt
 https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/reject.txt
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Hijacking.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Privacy.list
-https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Advertising.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Advertising/Advertising_All_No_Resolve.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PrivateTracker/PrivateTracker.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Privacy/Privacy_All_No_Resolve.list
