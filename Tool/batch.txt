@@ -306,19 +306,11 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Reddit.li
 
 [Reject]
 https://ruleset.skk.moe/List/domainset/reject.conf
-https://ruleset.skk.moe/List/non_ip/reject.conf
-https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/ip/reject.conf
+https://ruleset.skk.moe/List/non_ip/reject.conf
 https://ruleset.skk.moe/List/non_ip/reject-url-regex.conf
 https://ruleset.skk.moe/List/non_ip/reject-drop.conf
 https://ruleset.skk.moe/List/non_ip/reject-no-drop.conf
-https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/reject.txt
-https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/reject.txt
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Advertising/Advertising_All_No_Resolve.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PrivateTracker/PrivateTracker.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Privacy/Privacy_All_No_Resolve.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdGuardSDNSFilter/AdGuardSDNSFilter_All_No_Resolve.list
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AdvertisingTest/AdvertisingTest_All_No_Resolve.list
 EXCLUDE: google
 EXCLUDE: bittorrent
 EXCLUDE: qbittorrent
