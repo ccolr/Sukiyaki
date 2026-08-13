@@ -406,6 +406,7 @@ udp://yuptracker-eu.gaijinent.com:27022/announce
 udp://yuptracker-sa.gaijinent.com:27022/announce
 udp://yuptracker-us.gaijinent.com:27022/announce
 udp://yuptracker.gaijinent.com:27022/announce
+udp://udp.tracker.linvk.com:6969/announce
 http://tracker.opentrackr.org:1337/announce
 http://tracker2.dler.org:80/announce
 http://tracker.zhuqiy.dgj055.icu:80/announce
