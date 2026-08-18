@@ -34,6 +34,7 @@ EXCLUDE: gemini
 EXCLUDE: deepmind
 EXCLUDE: antigravity
 EXCLUDE: grok
+EXCLUDE: stripe
 EXCLUDE: ^x\.ai$
 EXCLUDE: ^g\.ai$
 EXCLUDE: ^go\.dev$
