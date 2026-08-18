@@ -10,6 +10,10 @@
 ./Rule/Adobe.conf
 ./MyRule/Adobe.conf
 
+[Adyen]
+./Rule/Adyen.conf
+./MyRule/Adyen.conf
+
 [Akamai]
 ./Rule/Akamai.conf
 ./MyRule/Akamai.conf
@@ -49,6 +53,10 @@
 [Bluesky]
 ./Rule/Bluesky.conf
 ./MyRule/Bluesky.conf
+
+[Checkout]
+./Rule/Checkout.conf
+./MyRule/Checkout.conf
 
 [Cloudflare]
 ./Rule/Cloudflare.conf
