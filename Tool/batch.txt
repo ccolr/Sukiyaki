@@ -332,6 +332,10 @@ EXCLUDE: ^hm\.baidu\.com$
 EXCLUDE: maccms\.la$
 EXCLUDE: anidb\.net$
 EXCLUDE: dplayerstatic\.com$
+EXCLUDE: ^95516\.com$
+EXCLUDE: \.95516\.com$
+EXCLUDE: ^cup\.com\.cn$
+EXCLUDE: \.cup\.com\.cn$
 
 [Snapchat]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Snap/Snap.list
