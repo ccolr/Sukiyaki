@@ -98,9 +98,17 @@
 ./Rule/GB.conf
 ./MyRule/GB.conf
 
+[Github]
+./Rule/Github.conf
+./MyRule/Github.conf
+
 [Google]
 ./Rule/Google.conf
 ./MyRule/Google.conf
+
+[Huggingface]
+./Rule/Huggingface.conf
+./MyRule/Huggingface.conf
 
 [HBO]
 ./Rule/HBO.conf
