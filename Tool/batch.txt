@@ -34,6 +34,7 @@ EXCLUDE: gemini
 EXCLUDE: deepmind
 EXCLUDE: antigravity
 EXCLUDE: grok
+EXCLUDE: github
 EXCLUDE: stripe
 EXCLUDE: ^x\.ai$
 EXCLUDE: ^g\.ai$
@@ -162,6 +163,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [GB]
 ./MyRule/GB.conf
 
+[Github]
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GitHub/GitHub.list
+
 [Google]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Google.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Google/Google.list
@@ -173,6 +177,9 @@ https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Gemini.li
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTube/YouTube.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/YouTubeMusic/YouTubeMusic.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Youtube.list
+
+[Huggingface]
+./MyRule/Huggingface.conf
 
 [HBO]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/HBO.list
