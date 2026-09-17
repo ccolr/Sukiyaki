@@ -280,15 +280,16 @@ udp://178.239.19.29:80/announce
 udp://180.131.145.175:6969/announce
 udp://185.121.168.96:1337/announce
 udp://185.189.13.39:6969/announce
+udp://185.216.179.62:25/announce
 udp://192.99.100.68:6969/announce
 udp://193.187.90.12:6969/announce
 udp://200.168.117.238:6969/announce
-udp://211.75.205.188:80/announce
-udp://211.75.210.221:6969/announce
+udp://208.83.20.20:6969/announce
+udp://211.75.205.187:6969/announce
+udp://211.75.205.187:80/announce
 udp://212.42.38.197:6969/announce
 udp://221.153.216.56:8081/announce
 udp://23.153.248.128:6969/announce
-udp://23.157.120.14:6969/announce
 udp://31.56.179.159:6969/announce
 udp://31.59.141.120:6969/announce
 udp://34.66.57.33:1337/announce
@@ -297,6 +298,7 @@ udp://37.120.182.83:15480/announce
 udp://37.60.249.217:6969/announce
 udp://38.180.157.12:2715/announce
 udp://43.250.54.126:6969/announce
+udp://45.137.199.107:6969/announce
 udp://45.38.170.167:6969/announce
 udp://47.76.201.250:6969/announce
 udp://51.222.82.36:6969/announce
@@ -307,8 +309,6 @@ udp://65.109.28.33:6969/announce
 udp://74.119.149.136:6969/announce
 udp://83.102.180.21:80/announce
 udp://85.17.55.112:6969/announce
-udp://89.234.156.205:451/announce
-udp://90.226.147.124:6969/announce
 udp://91.177.126.188:6969/announce
 udp://93.158.213.92:6969/announce
 udp://94.23.207.177:6969/announce
@@ -329,7 +329,6 @@ udp://coeus.torrentonline.cc:42069/announce
 udp://d40969.acod.regrucolo.ru:6969/announce
 udp://ds32244.seedhost.eu:6969/announce
 udp://ec2-18-191-163-220.us-east-2.compute.amazonaws.com:6969/announce
-udp://files.project-cataclysm.ru:6969/announce
 udp://freetracker.i2p:1337/announce
 udp://ibksturm.synology.me:6969/announce
 udp://ipv4.tracker.harry.lu:6969/announce
@@ -344,6 +343,7 @@ udp://node02.madtia.cc:42069/announce
 udp://obey.torrentonline.cc:42069/announce
 udp://open.stealth.si:6969/announce
 udp://opentor.org:2710/announce
+udp://opentracker.lain.moscow:6969/announce
 udp://opentracker.simp.i2p:6969/a
 udp://opentracker.skank.i2p:6969/a
 udp://p2p.publictracker.xyz:6969/announce
@@ -1068,10 +1068,10 @@ http://11.rarbg.com:80/announce
 http://140.235.237.23:6969/announce
 http://185.126.65.92:6969/announce
 http://200.168.117.238:6969/announce
-http://211.75.205.188:80/announce
-http://211.75.210.221:6969/announce
+http://211.75.205.187:6969/announce
+http://211.75.205.187:80/announce
+http://211.75.205.188:6969/announce
 http://216.144.239.90:6969/announce
-http://34.66.57.33:1337/announce
 http://37.60.249.217:6969/announce
 http://43.250.54.126:6969/announce
 http://51.79.71.167/announce
