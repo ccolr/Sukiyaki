@@ -36,6 +36,7 @@ EXCLUDE: antigravity
 EXCLUDE: grok
 EXCLUDE: github
 EXCLUDE: stripe
+EXCLUDE: github
 EXCLUDE: cloudflare
 EXCLUDE: ^x\.ai$
 EXCLUDE: ^g\.ai$
