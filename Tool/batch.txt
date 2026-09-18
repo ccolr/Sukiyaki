@@ -39,6 +39,13 @@ EXCLUDE: stripe
 EXCLUDE: copilot
 EXCLUDE: microsoft
 EXCLUDE: cloudflare
+EXCLUDE: jetbrains
+EXCLUDE: meta\.ai
+EXCLUDE: msn\.com
+EXCLUDE: bing\.com
+EXCLUDE: bingapis\.com
+EXCLUDE: appcenter\.ms
+EXCLUDE: live\.com
 EXCLUDE: ^x\.ai$
 EXCLUDE: ^g\.ai$
 EXCLUDE: ^go\.dev$
