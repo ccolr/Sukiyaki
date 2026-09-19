@@ -182,6 +182,7 @@ EXCLUDE: rawgit.com
 EXCLUDE: rawgithub.com
 EXCLUDE: github-atom-io-herokuapp-com.freetls.fastly.net
 EXCLUDE: github-avatars.oss-cn-hongkong.aliyuncs.com
+EXCLUDE: ^DOMAIN-KEYWORD,github$
 
 [Google]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Google.list
