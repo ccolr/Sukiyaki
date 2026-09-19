@@ -404,6 +404,7 @@ udp://yuki.bt.bontal.net:6969/announce
 udp://yuptracker-sa.gaijinent.com:27022/announce
 udp://yuptracker-us.gaijinent.com:27022/announce
 udp://yuptracker.gaijinent.com:27022/announce
+udp://tracker.willy.pro:6969/announce
 http://tracker.opentrackr.org:1337/announce
 http://tracker.qu.ax:6969/announce
 http://tracker.dler.com:6969/announce
