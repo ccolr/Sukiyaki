@@ -178,6 +178,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 EXCLUDE: githubusercontent.com
 EXCLUDE: github-cloud.s3.amazonaws.com
 EXCLUDE: ghcr.io
+EXCLUDE: github.io
 EXCLUDE: rawgit.com
 EXCLUDE: rawgithub.com
 EXCLUDE: github-atom-io-herokuapp-com.freetls.fastly.net
