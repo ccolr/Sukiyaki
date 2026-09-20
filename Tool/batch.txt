@@ -63,6 +63,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AmazonCN/AmazonCN.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/PrimeVideo.list
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PrimeVideo/PrimeVideo.list
+EXCLUDE: ^IP-CIDR6?,
+EXCLUDE: ^DOMAIN-SUFFIX,cloudfront(?:-test)?\.(?:net|cn)$
+EXCLUDE: ^DOMAIN-SUFFIX,llnwd\.net$
 
 [Apple]
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Apple.list
