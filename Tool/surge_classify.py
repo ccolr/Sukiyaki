@@ -468,13 +468,18 @@ def write_classified(
     build_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     for category, rule_list in category_map.items():
+        out_dir = os.path.join(output_base, "Surge", category)
+        out_path = os.path.join(out_dir, filename)
+
         if not rule_list:
-            print(f"  [{category}] empty, skipping generation")
+            if os.path.isfile(out_path) or os.path.islink(out_path):
+                os.unlink(out_path)
+                print(f"  [{category}] empty, deleted stale file -> {out_path}")
+            else:
+                print(f"  [{category}] empty, no output file")
             continue
 
-        out_dir = os.path.join(output_base, "Surge", category)
         os.makedirs(out_dir, exist_ok=True)
-        out_path = os.path.join(out_dir, filename)
 
         header = "\n".join(
             [
@@ -498,6 +503,31 @@ def write_classified(
         print(f"  [{category}] {len(rule_list)} rules -> {out_path}")
 
     return written
+
+
+def remove_obsolete_classified(output_base: str, expected_paths: set[str]) -> list[str]:
+    """Delete generated .conf files that are not part of the current batch result."""
+    expected = {os.path.abspath(path) for path in expected_paths}
+    removed = []
+
+    for category in ("domains", "non_ip", "ip"):
+        out_dir = os.path.join(output_base, "Surge", category)
+        if not os.path.isdir(out_dir):
+            continue
+
+        for filename in os.listdir(out_dir):
+            if not filename.endswith(".conf"):
+                continue
+
+            path = os.path.join(out_dir, filename)
+            if os.path.abspath(path) in expected:
+                continue
+            if os.path.isfile(path) or os.path.islink(path):
+                os.unlink(path)
+                removed.append(path)
+                print(f"  [sync] deleted obsolete file -> {path}")
+
+    return removed
 
 
 def print_stats(stats: dict, name: str):
@@ -630,7 +660,11 @@ def main():
     tasks = all_tasks
 
     total = len(tasks)
-    success_count = 0
+    prepared_tasks = []
+    failed_tasks = []
+
+    # Build every result in memory first. Do not touch the target repository
+    # unless all sources were fetched and classified successfully.
     for idx, (name, urls, group_excludes) in enumerate(tasks, 1):
         print(f"\n{'=' * 50}")
         print(f"  Task [{idx}/{total}]: {name}")
@@ -638,21 +672,32 @@ def main():
         rules, stats = merge_and_clean(urls, group_excludes)
 
         if rules is None:
-            print(f"[error] task {name} aborted due to a source load failure, skipping output", file=sys.stderr)
-            continue
-
-        if not rules:
-            print(f"[warning] {name} produced an empty result, skipping", file=sys.stderr)
+            print(f"[error] task {name} aborted due to a source load failure", file=sys.stderr)
+            failed_tasks.append(name)
             continue
 
         domains, non_ip, ip = classify_rules(rules)
         domains, non_ip, ip = sort_classified(domains, non_ip, ip)
-        write_classified(domains, non_ip, ip, args.output_dir, name, stats)
+        prepared_tasks.append((name, domains, non_ip, ip, stats))
+
+    if failed_tasks:
+        print(
+            f"\n[error] {len(failed_tasks)} task(s) failed; target repository was left unchanged: "
+            + ", ".join(failed_tasks),
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    expected_paths = set()
+    for name, domains, non_ip, ip, stats in prepared_tasks:
+        written = write_classified(domains, non_ip, ip, args.output_dir, name, stats)
+        expected_paths.update(written.values())
         print_stats(stats, name)
-        success_count += 1
+
+    remove_obsolete_classified(args.output_dir, expected_paths)
 
     if total > 1:
-        print(f"\nAll done, successfully processed {success_count}/{total} group(s)")
+        print(f"\nAll done, successfully processed {total}/{total} group(s)")
 
 
 if __name__ == "__main__":

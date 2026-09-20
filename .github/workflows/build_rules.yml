@@ -78,12 +78,12 @@ jobs:
       - name: Sync Surge_Modules/ to the Rule repo
         run: |
           mkdir -p Rule/Surge_Modules
-          rsync -a Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
+          rsync -a --checksum --delete Sukiyaki/Surge_Modules/ Rule/Surge_Modules/
 
       - name: Sync Trackers/ to the Rule repo
         run: |
           mkdir -p Rule/Trackers
-          rsync -a Sukiyaki/Trackers/ Rule/Trackers/
+          rsync -a --checksum --delete Sukiyaki/Trackers/ Rule/Trackers/
 
       - name: Push to the Rule repo
         run: |
