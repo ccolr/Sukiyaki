@@ -1,6 +1,7 @@
 #!name=VPS Knockd Manual Control
 #!desc=Manual open and close controls for one VPS. Each panel sends only its corresponding knockd sequence.
 #!category=🌸 Sukiyaki
+#!author=otmno
 #!arguments=vps_name:VPS-1,vps_host:vps1.example.com,open_ports:7123|8234|9345,close_ports:9345|8234|7123
 #!arguments-desc=Configure the VPS name, address, open sequence, and close sequence. Separate ports with | and use no more than 5 ports per sequence.
 
