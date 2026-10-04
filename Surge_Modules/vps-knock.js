@@ -3,9 +3,11 @@
 (function () {
     "use strict";
 
-    const KNOCK_REQUEST_TIMEOUT_SECONDS = 1;
+    // Keep the connection attempt shorter than the normal first TCP SYN
+    // retransmission window. A knock is the initial connection attempt; an
+    // HTTP response is neither required nor expected.
+    const KNOCK_REQUEST_TIMEOUT_SECONDS = 0.5;
     const KNOCK_GAP_MILLISECONDS = 100;
-    const FINISH_GRACE_MILLISECONDS = 250;
     const MAX_KNOCK_PORTS = 5;
     let completed = false;
 
@@ -104,6 +106,13 @@
     const configuredName = String(args.name || "").trim() || String(args.host || "").trim() || "VPS";
     const actionLabel = action === "open" ? "Open" : "Close";
     const panelTitle = configuredName + " Knock " + actionLabel;
+    const sessionID = typeof $script === "object" && $script && $script.sessionID
+        ? String($script.sessionID)
+        : "unknown";
+    const trigger = typeof $trigger === "string" ? $trigger : "unknown";
+    const system = typeof $environment === "object" && $environment && $environment.system
+        ? String($environment.system)
+        : "unknown";
 
     if (typeof $trigger === "string" && $trigger === "auto-interval") {
         finish(panelTitle, "Automatic refresh is disabled. Run this action manually.", "alert");
@@ -128,36 +137,82 @@
         return;
     }
 
-    ports.forEach(function (port, index) {
-        setTimeout(function () {
-            console.log(
-                "[vps-knock] " + name + " " + actionLabel +
-                " " + (index + 1) + "/" + ports.length + ": " + port
-            );
+    console.log(
+        "[vps-knock] session=" + sessionID +
+        " trigger=" + trigger +
+        " system=" + system +
+        " action=" + action +
+        " target=" + host +
+        " ports=" + ports.join("|")
+    );
 
-            try {
-                $httpClient.head({
-                    url: "http://" + host + ":" + port + "/",
-                    timeout: KNOCK_REQUEST_TIMEOUT_SECONDS,
-                    policy: "DIRECT",
-                    "auto-redirect": false,
-                    "auto-cookie": false
-                }, function () {});
-            } catch (error) {
-                console.log("[vps-knock] Failed to start the request for port " + port + ": " + error.message);
-            }
-        }, index * KNOCK_GAP_MILLISECONDS);
-    });
-
-    setTimeout(function () {
+    function finishSequence() {
         finish(
             name + " Knock " + actionLabel,
             [
                 "Target: " + host,
                 "Sequence: " + ports.join(" → "),
+                "Mode: serial DIRECT",
                 "Please manually verify the actual connectivity status."
             ].join("\n"),
             "good"
         );
-    }, (ports.length - 1) * KNOCK_GAP_MILLISECONDS + FINISH_GRACE_MILLISECONDS);
+    }
+
+    function sendPort(index) {
+        if (completed) return;
+
+        const port = ports[index];
+        let settled = false;
+
+        function continueSequence(error, response) {
+            if (settled || completed) return;
+            settled = true;
+
+            const status = response && Number(response.status);
+            const result = Number.isFinite(status)
+                ? "HTTP " + status
+                : (error ? "no HTTP response" : "completed");
+            console.log(
+                "[vps-knock] session=" + sessionID +
+                " completed=" + (index + 1) + "/" + ports.length +
+                " port=" + port +
+                " result=" + result
+            );
+
+            if (index + 1 >= ports.length) {
+                finishSequence();
+                return;
+            }
+
+            setTimeout(function () {
+                sendPort(index + 1);
+            }, KNOCK_GAP_MILLISECONDS);
+        }
+
+        console.log(
+            "[vps-knock] session=" + sessionID +
+            " sending=" + (index + 1) + "/" + ports.length +
+            " port=" + port
+        );
+
+        try {
+            $httpClient.head({
+                url: "http://" + host + ":" + port + "/",
+                timeout: KNOCK_REQUEST_TIMEOUT_SECONDS,
+                policy: "DIRECT",
+                "auto-redirect": false,
+                "auto-cookie": false
+            }, continueSequence);
+        } catch (error) {
+            console.log(
+                "[vps-knock] session=" + sessionID +
+                " failed-to-start port=" + port +
+                " error=" + error.message
+            );
+            continueSequence(error, null);
+        }
+    }
+
+    sendPort(0);
 })();

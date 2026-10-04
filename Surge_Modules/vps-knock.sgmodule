@@ -6,8 +6,8 @@
 #!arguments-desc=Configure the VPS name, address, open sequence, and close sequence. Separate ports with | and use no more than 5 ports per sequence.
 
 [Script]
-VPS-Knock-Open = type=generic,timeout=10,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=open&name={{{vps_name}}}&host={{{vps_host}}}&ports={{{open_ports}}}"
-VPS-Knock-Close = type=generic,timeout=10,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=close&name={{{vps_name}}}&host={{{vps_host}}}&ports={{{close_ports}}}"
+VPS-Knock-Open = type=generic,timeout=10,engine=jsc,script-update-interval=60,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=open&name={{{vps_name}}}&host={{{vps_host}}}&ports={{{open_ports}}}"
+VPS-Knock-Close = type=generic,timeout=10,engine=jsc,script-update-interval=60,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=close&name={{{vps_name}}}&host={{{vps_host}}}&ports={{{close_ports}}}"
 
 [Panel]
 VPS-Knock-Open = title="{{{vps_name}}} Knock Open",content="Target: {{{vps_host}}}\nSequence: {{{open_ports}}}",icon=xserve,script-name=VPS-Knock-Open
