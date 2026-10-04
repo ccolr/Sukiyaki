@@ -1,13 +1,13 @@
 #!name=VPS Knockd Manual Control
-#!desc=Manual open and close controls for one VPS. Each panel sends only its corresponding knockd sequence.
+#!desc=Manual retry-safe open and close controls for one VPS. Every knock request uses DIRECT without changing Surge's outbound mode.
 #!category=🌸 Sukiyaki
 #!author=otmno
-#!arguments=vps_name:VPS-1,vps_host:vps1.example.com,open_ports:7123|8234|9345,close_ports:9345|8234|7123
-#!arguments-desc=Configure the VPS name, address, open sequence, and close sequence. Separate ports with | and use no more than 5 ports per sequence.
+#!arguments=vps_name:VPS-1,vps_host:vps1.example.com,open_ports:7123|8234|9345|10456,close_ports:9345|8234|7123|10567
+#!arguments-desc=Separate ports with |. The last port of each sequence must be unique and must not appear anywhere in the opposite sequence. Configure the same sequences in knockd. Maximum 5 ports per sequence.
 
 [Script]
-VPS-Knock-Open = type=generic,timeout=10,engine=jsc,script-update-interval=60,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=open&name={{{vps_name}}}&host={{{vps_host}}}&ports={{{open_ports}}}"
-VPS-Knock-Close = type=generic,timeout=10,engine=jsc,script-update-interval=60,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=close&name={{{vps_name}}}&host={{{vps_host}}}&ports={{{close_ports}}}"
+VPS-Knock-Open = type=generic,timeout=10,engine=jsc,script-update-interval=60,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=open&name={{{vps_name}}}&host={{{vps_host}}}&open={{{open_ports}}}&close={{{close_ports}}}"
+VPS-Knock-Close = type=generic,timeout=10,engine=jsc,script-update-interval=60,script-path=https://sukiyaki.cco.moe/Surge_Modules/vps-knock.js,argument="action=close&name={{{vps_name}}}&host={{{vps_host}}}&open={{{open_ports}}}&close={{{close_ports}}}"
 
 [Panel]
 VPS-Knock-Open = title="{{{vps_name}}} Knock Open",content="Target: {{{vps_host}}}\nSequence: {{{open_ports}}}",icon=xserve,script-name=VPS-Knock-Open
