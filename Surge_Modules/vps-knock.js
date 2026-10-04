@@ -3,10 +3,14 @@
 (function () {
     "use strict";
 
-    // Keep the connection attempt shorter than the normal first TCP SYN
-    // retransmission window. A knock is the initial connection attempt; an
-    // HTTP response is neither required nor expected.
-    const KNOCK_REQUEST_TIMEOUT_SECONDS = 0.5;
+    // $httpClient has no cancellation handle. Each request is therefore given
+    // a unique URL marker and explicitly terminated through Surge's own
+    // /v1/requests/kill API before the next knock port is contacted.
+    const KNOCK_REQUEST_TIMEOUT_SECONDS = 5;
+    const KNOCK_PULSE_MILLISECONDS = 300;
+    const ACTIVE_REQUEST_POLL_MILLISECONDS = 50;
+    const ACTIVE_REQUEST_MAX_POLLS = 8;
+    const ACTIVE_REQUEST_STOP_TIMEOUT_MILLISECONDS = 2000;
     const KNOCK_GAP_MILLISECONDS = 100;
     const MAX_KNOCK_PORTS = 5;
     let completed = false;
@@ -101,6 +105,40 @@
         return host;
     }
 
+    function matchingRequestIDs(value, marker) {
+        const ids = [];
+        const seen = {};
+
+        function visit(node) {
+            if (!node || typeof node !== "object") return;
+
+            let serialized;
+            try {
+                serialized = JSON.stringify(node);
+            } catch (error) {
+                return;
+            }
+            if (serialized.indexOf(marker) < 0) return;
+
+            if (Object.prototype.hasOwnProperty.call(node, "id")) {
+                const rawID = node.id;
+                const id = /^\d+$/.test(String(rawID)) ? Number(rawID) : rawID;
+                const key = typeof id + ":" + String(id);
+                if (!seen[key]) {
+                    seen[key] = true;
+                    ids.push(id);
+                }
+            }
+
+            Object.keys(node).forEach(function (key) {
+                visit(node[key]);
+            });
+        }
+
+        visit(value);
+        return ids;
+    }
+
     const args = parseArguments(typeof $argument === "string" ? $argument : "");
     const action = args.action;
     const configuredName = String(args.name || "").trim() || String(args.host || "").trim() || "VPS";
@@ -152,7 +190,7 @@
             [
                 "Target: " + host,
                 "Sequence: " + ports.join(" → "),
-                "Mode: serial DIRECT",
+                "Mode: serial DIRECT + explicit request termination",
                 "Please manually verify the actual connectivity status."
             ].join("\n"),
             "good"
@@ -163,16 +201,18 @@
         if (completed) return;
 
         const port = ports[index];
+        const marker = "surge-knock-" +
+            sessionID.replace(/[^a-zA-Z0-9_-]/g, "_") + "-" +
+            Date.now() + "-" + index;
+        const requestURL = "http://" + host + ":" + port +
+            "/?_surge_knock=" + marker;
         let settled = false;
+        let killIssued = false;
 
-        function continueSequence(error, response) {
+        function continueSequence(result) {
             if (settled || completed) return;
             settled = true;
 
-            const status = response && Number(response.status);
-            const result = Number.isFinite(status)
-                ? "HTTP " + status
-                : (error ? "no HTTP response" : "completed");
             console.log(
                 "[vps-knock] session=" + sessionID +
                 " completed=" + (index + 1) + "/" + ports.length +
@@ -190,6 +230,77 @@
             }, KNOCK_GAP_MILLISECONDS);
         }
 
+        function abortSequence(reason) {
+            if (settled || completed) return;
+            settled = true;
+            console.log(
+                "[vps-knock] session=" + sessionID +
+                " abort port=" + port +
+                " reason=" + reason
+            );
+            finish(
+                name + " Knock " + actionLabel + " Aborted",
+                [
+                    "Target: " + host,
+                    "Sequence stopped at port: " + port,
+                    reason,
+                    "No later knock ports were contacted."
+                ].join("\n"),
+                "error"
+            );
+        }
+
+        function stopActiveRequest(pollNumber) {
+            if (settled || completed) return;
+
+            try {
+                $httpAPI("GET", "/v1/requests/active", {}, function (activeResult) {
+                    if (settled || completed) return;
+
+                    const ids = matchingRequestIDs(activeResult, marker);
+                    if (ids.length === 0) {
+                        if (killIssued) {
+                            continueSequence("explicitly terminated");
+                            return;
+                        }
+                        if (pollNumber + 1 < ACTIVE_REQUEST_MAX_POLLS) {
+                            setTimeout(function () {
+                                stopActiveRequest(pollNumber + 1);
+                            }, ACTIVE_REQUEST_POLL_MILLISECONDS);
+                            return;
+                        }
+                        abortSequence("Unable to locate and terminate the active request safely.");
+                        return;
+                    }
+
+                    if (killIssued && pollNumber >= ACTIVE_REQUEST_MAX_POLLS) {
+                        abortSequence("The request remained active after the termination command.");
+                        return;
+                    }
+
+                    killIssued = true;
+                    let remaining = ids.length;
+                    ids.forEach(function (id) {
+                        try {
+                            $httpAPI("POST", "/v1/requests/kill", {id: id}, function () {
+                                if (settled || completed) return;
+                                remaining -= 1;
+                                if (remaining === 0) {
+                                    setTimeout(function () {
+                                        stopActiveRequest(pollNumber + 1);
+                                    }, ACTIVE_REQUEST_POLL_MILLISECONDS);
+                                }
+                            });
+                        } catch (error) {
+                            abortSequence("Failed to terminate request " + id + ": " + error.message);
+                        }
+                    });
+                });
+            } catch (error) {
+                abortSequence("Failed to inspect active requests: " + error.message);
+            }
+        }
+
         console.log(
             "[vps-knock] session=" + sessionID +
             " sending=" + (index + 1) + "/" + ports.length +
@@ -198,19 +309,33 @@
 
         try {
             $httpClient.head({
-                url: "http://" + host + ":" + port + "/",
+                url: requestURL,
                 timeout: KNOCK_REQUEST_TIMEOUT_SECONDS,
                 policy: "DIRECT",
                 "auto-redirect": false,
                 "auto-cookie": false
-            }, continueSequence);
+            }, function (error, response) {
+                if (killIssued) return;
+                const status = response && Number(response.status);
+                const result = Number.isFinite(status)
+                    ? "HTTP " + status
+                    : (error ? "request ended before explicit termination" : "completed");
+                continueSequence(result);
+            });
+
+            setTimeout(function () {
+                stopActiveRequest(0);
+            }, KNOCK_PULSE_MILLISECONDS);
+            setTimeout(function () {
+                abortSequence("Timed out while terminating the active request.");
+            }, ACTIVE_REQUEST_STOP_TIMEOUT_MILLISECONDS);
         } catch (error) {
             console.log(
                 "[vps-knock] session=" + sessionID +
                 " failed-to-start port=" + port +
                 " error=" + error.message
             );
-            continueSequence(error, null);
+            abortSequence("Failed to start the request: " + error.message);
         }
     }
 
