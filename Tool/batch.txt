@@ -350,6 +350,7 @@ EXCLUDE: google
 EXCLUDE: bittorrent
 EXCLUDE: qbittorrent
 EXCLUDE: transmission
+EXCLUDE: \.sa\.net$
 EXCLUDE: ^juejin\.cn$
 EXCLUDE: \.juejin\.cn$
 EXCLUDE: ^awstrack\.me$
