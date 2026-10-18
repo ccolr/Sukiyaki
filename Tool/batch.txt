@@ -283,6 +283,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Oracle/Oracle.list
 https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/rule/Oracle.list
 EXCLUDE: cybersource
+EXCLUDE: ^41900$
 
 [PayPal]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list
