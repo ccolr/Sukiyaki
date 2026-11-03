@@ -266,6 +266,7 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [Netflix]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Netflix/Netflix.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Netflix.list
+EXCLUDE: fast\.com
 
 [Niconico]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Niconico/Niconico.list
