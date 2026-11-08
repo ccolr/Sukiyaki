@@ -371,6 +371,8 @@ EXCLUDE: ^zztfly\.com$
 EXCLUDE: \.zztfly\.com$
 EXCLUDE: ^fengkongcloud\.cn$
 EXCLUDE: \.fengkongcloud\.cn$
+EXCLUDE: ^fengkongcloud\.com$
+EXCLUDE: \.fengkongcloud\.com$
 
 [Snapchat]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Snap/Snap.list
