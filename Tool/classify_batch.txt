@@ -202,6 +202,10 @@
 ./Rule/Pixiv.conf
 ./MyRule/Pixiv.conf
 
+[Pre-Direct]
+./Rule/Pre-Direct.conf
+./MyRule/Pre-Direct.conf
+
 [Pre-Reject]
 ./Rule/Pre-Reject.conf
 ./MyRule/Pre-Reject.conf

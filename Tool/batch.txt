@@ -302,6 +302,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [Pixiv]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Pixiv/Pixiv.list
 
+[Pre-Direct]
+./MyRule/Pre-Direct.conf
+
 [Pre-Reject]
 ./MyRule/Pre-Reject.conf
 
@@ -367,12 +370,6 @@ EXCLUDE: ^95516\.com$
 EXCLUDE: \.95516\.com$
 EXCLUDE: ^cup\.com\.cn$
 EXCLUDE: \.cup\.com\.cn$
-EXCLUDE: ^zztfly\.com$
-EXCLUDE: \.zztfly\.com$
-EXCLUDE: ^fengkongcloud\.cn$
-EXCLUDE: \.fengkongcloud\.cn$
-EXCLUDE: ^fengkongcloud\.com$
-EXCLUDE: \.fengkongcloud\.com$
 
 [Snapchat]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Snap/Snap.list
