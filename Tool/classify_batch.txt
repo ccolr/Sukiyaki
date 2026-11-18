@@ -42,10 +42,6 @@
 ./Rule/BT.conf
 ./MyRule/BT.conf
 
-[Bittorrent]
-./Rule/Bittorrent.conf
-./MyRule/Bittorrent.conf
-
 [bilibili]
 ./Rule/bilibili.conf
 ./MyRule/bilibili.conf
