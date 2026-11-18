@@ -206,6 +206,10 @@
 ./Rule/Pre-Direct.conf
 ./MyRule/Pre-Direct.conf
 
+[Pre-Proxy]
+./Rule/Pre-Proxy.conf
+./MyRule/Pre-Proxy.conf
+
 [Pre-Reject]
 ./Rule/Pre-Reject.conf
 ./MyRule/Pre-Reject.conf

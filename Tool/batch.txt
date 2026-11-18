@@ -99,9 +99,6 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 [BT]
 ./MyRule/BT.conf
 
-[Bittorrent]
-./MyRule/Bittorrent.conf
-
 [bilibili]
 https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BiliBili/BiliBili.list
 https://raw.githubusercontent.com/meslcloud/Rule/refs/heads/main/Surge/Bilibili.list
@@ -304,6 +301,9 @@ https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge
 
 [Pre-Direct]
 ./MyRule/Pre-Direct.conf
+
+[Pre-Proxy]
+./MyRule/Pre-Proxy.conf
 
 [Pre-Reject]
 ./MyRule/Pre-Reject.conf
